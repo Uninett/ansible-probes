@@ -1,0 +1,21 @@
+---
+- name: Install owamp dependencies
+  apt: name={{ item }} state=present
+  with_items:
+    - "build-essential"
+    - "libi2util-dev"
+
+- name: Download owamp source
+  get_url: url=http://software.internet2.edu/sources/owamp/owamp-3.4-10.tar.gz dest={{ prog_dir }}/owamp.tar.gz
+
+- name: Extract owamp source
+  unarchive: src="{{ prog_dir }}/owamp.tar.gz" dest="{{ prog_dir }}" copy=no
+
+- name: Run config generator
+  command: ./configure chdir="{{ prog_dir }}/owamp-3.4"
+
+- name: Compile owamp
+  make: chdir="{{ prog_dir }}/owamp-3.4"
+
+- name: Install owamp
+  make: chdir="{{ prog_dir }}/owamp-3.4" target=install

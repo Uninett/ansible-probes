@@ -1,0 +1,14 @@
+---
+- name: "Enable {{ args.name }}"
+  cron:
+    name: "{{ args.name }}"
+    minute: "{{ args.interval.minute }}"
+    hour: "{{ args.interval.hour }}"
+    job: "{{ ramdisk_dir }}/{{ args.script_file }}"
+  when: "{{ args.enabled }}"
+
+- name: "Disable {{ args.name }}"
+  cron:
+    name: "{{ args.name }}"
+    state: absent
+  when: "not {{ args.enabled }}"

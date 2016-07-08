@@ -1,0 +1,86 @@
+---
+- include_vars: ../vars/vault.yml
+
+- name: Transfer json-formatted script config
+  copy: content="{{ (default_script_configs | union(group_script_configs | union(host_script_configs))) | to_json }}" dest={{ script_dir }}/script_configs.json
+
+- include: driver.yml
+  vars:
+    should_compile: no
+
+- name: Touch program directory
+  file: path={{ prog_dir }} state=directory mode=0755
+
+# This will compile owamp, but it's easier to just transfer an
+# already compiled version
+
+# - name: Check if owping is installed
+#   stat: path=/usr/local/bin/owping
+#   register: owping
+
+# - include: owamp.yml
+#   when: not owping.stat.exists
+
+- name: Transfer owping
+  copy: src=owping dest=/usr/local/bin/owping
+
+# Is this necessary?
+# - name: Update apt repositories
+#   apt: update_cache=yes
+
+- name: Install necessary packages
+  apt: name={{ item }} state=present
+  with_items: "{{ packages }}"
+
+- name: Touch script directory
+  file: path={{ script_dir }} state=directory mode=0755
+
+- name: Transfer scripts
+  synchronize: src=wifi_scripts/ dest={{ script_dir }}/
+
+- name: Make the scripts executable
+  shell: "chmod +x {{ script_dir | quote }}/*.sh {{ script_dir | quote }}/*.py"
+
+- name: Transfer templated config files
+  template: src={{ item }} dest={{ script_dir }}/
+  with_fileglob: ../templates/*
+
+- name: Transfer wpa_supplicant certificate
+  copy: src=uninett-ca.cer dest=/etc/wpa_supplicant/uninett-ca.cer
+
+- name: Transfer control program
+  copy: src=control_program.py dest={{ script_dir }}/
+  register: ctrl_program_copy
+
+- name: Generate probe id from eth0 MAC
+  command: "{{ script_dir }}/generate_probe_id.sh"
+  args:
+    chdir: "{{ script_dir }}"
+
+- name: Run ramdisk creation script
+  command: "{{ script_dir }}/create_ramdisk.sh {{ ramdisk_dir }} {{ script_dir }}"
+
+- name: Make ramdisk script start at boot
+  cron:
+    name: Create ramdisk
+    special_time: reboot
+    job: "{{ script_dir }}/create_ramdisk.sh {{ ramdisk_dir }} {{ script_dir }}"
+
+- name: Kill any existing control program daemon
+  command: daemon --name control_program --stop
+  ignore_errors: yes
+  when: ctrl_program_copy|changed
+
+# This will have no effect if the daemon is
+# already running, so we don't need a conditional
+- name: Daemonize control program
+  command: "daemon --respawn --name control_program {{ script_dir }}/control_program.py {{ ramdisk_dir }}"
+
+- name: Make control program start at boot
+  cron:
+    name: Start control program
+    special_time: reboot
+    job: "daemon --respawn --name control_program {{ script_dir }}/control_program.py {{ ramdisk_dir }}"
+
+- name: Ensure cron is enabled
+  service: name=cron enabled=yes

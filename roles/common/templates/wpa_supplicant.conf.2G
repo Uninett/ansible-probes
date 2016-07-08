@@ -1,0 +1,20 @@
+ctrl_interface=/var/run/wpa_supplicant
+#ctrl_interface_group=pi
+ap_scan=1
+ignore_old_scan_res=0
+freq_list=2462
+        network={
+              ssid="{{ networks.two_g.ssid }}"
+              scan_freq=2412 2417 2422 2427 2432 2437 2442 2447 2452 2457 2462 2467 2472
+              freq_list=2412 2417 2422 2427 2432 2437 2442 2447 2452 2457 2462 2467 2472 
+              key_mgmt=WPA-EAP
+              eap=TTLS
+              anonymous_identity="{{ networks.two_g.anonymous_id }}"
+              ca_cert="/etc/wpa_supplicant/uninett-ca.cer"
+              identity="{{ networks.two_g.username }}"
+              password="{{ networks.two_g.password }}"
+              phase1="peaplabel=0"
+              phase2="auth=MSCHAPV2"
+              priority=1
+        }
+update_config=1

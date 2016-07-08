@@ -1,0 +1,6 @@
+---
+host_script_configs:
+  - name: Scan for number of cells
+    script_file: scan.sh
+    enabled: true
+    minute_interval: 3

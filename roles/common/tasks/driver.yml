@@ -1,0 +1,55 @@
+---
+# This playbook installs the needed wifi driver on
+# the rpi. By first performing some checks, it places
+# itself somewhere on this ladder, and moves downwards:
+#
+# | - Cross compile driver
+# | - Install driver on remote host
+# | - Load driver on remote host
+# v - Nothing (left) to do
+
+### Step 0: Gather some facts
+
+- name: Check if the driver is loaded
+  shell: "lsmod | grep 8812au"
+  ignore_errors: yes
+  register: loaded
+
+- name: Check if the driver is installed
+  stat: path="/lib/modules/{{ ansible_kernel }}/kernel/drivers/net/wireless/8812au.ko"
+  register: remote_driver
+
+- name: Check if we already have a compiled driver
+  local_action: stat path={{ role_path }}/files/drivers/{{ ansible_kernel }}-8812au.ko
+  register: local_driver
+
+### The driver needs to be compiled
+
+- name: Cross compile the driver module
+  local_action: >
+    command 
+    {{ role_path }}/files/compile_driver.sh 
+    {{ inventory_hostname }} 
+    {{ ansible_kernel }} 
+    {{ role_path }}/files/drivers/
+  when: loaded|failed and not remote_driver.stat.exists and not local_driver.stat.exists and should_compile
+
+### The driver needs to be installed
+
+- name: Install the driver module
+  copy: src="files/drivers/{{ ansible_kernel }}-8812au.ko" dest="/lib/modules/{{ ansible_kernel }}/kernel/drivers/net/wireless/8812au.ko"
+  when: loaded|failed and not remote_driver.stat.exists
+
+- name: Start driver at boot
+  lineinfile: dest=/etc/modules line=8812au
+  when: loaded|failed and not remote_driver.stat.exists
+
+- name: Complete driver installation
+  command: depmod
+  when: loaded|failed and not remote_driver.stat.exists
+
+### The driver needs to be loaded
+
+- name: Load the driver module
+  command: modprobe 8812au
+  when: loaded|failed

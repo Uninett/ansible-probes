@@ -1,0 +1,11 @@
+---
+group_script_configs:
+  - name: Measure link quality & bitrate
+    script_file: collect.sh any
+    enabled: true
+    minute_interval: 5
+
+  - name: Measure connection time for ipv6
+    script_file: run_owping6.sh any
+    enabled: false
+    minute_interval: 3

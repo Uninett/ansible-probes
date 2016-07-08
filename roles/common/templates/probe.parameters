@@ -1,0 +1,11 @@
+# This config file contains parameters used by the different scripts 
+#
+SERVER_BWCTL4={{ bwctl.server_ipv4 }}
+SERVER_BWCTL6={{ bwctl.server_ipv6 }}
+SERVER_OWAMP4={{ owamp.server_ipv4 }}
+SERVER_OWAMP6={{ owamp.server_ipv6 }}
+SERVER_WWW={{ www_server }}
+SERVER_RTT={{ rtt.server }}
+
+RTT_SAMPLES={{ rtt.samples }}
+#

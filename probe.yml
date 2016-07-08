@@ -1,0 +1,8 @@
+---
+- name: Set up and configure wifi probe
+  hosts: all
+  remote_user: root
+
+  roles:
+    - common
+    # - cron

@@ -1,0 +1,33 @@
+---
+# Important: path must not have / at end # (it will interfere with Ansible's synchronize module)
+script_dir: "{{ ansible_env.HOME }}/scripts"
+ramdisk_dir: "{{ script_dir }}/probefiles"
+prog_dir: "{{ ansible_env.HOME }}/programs"
+
+bwctl:
+  server_ipv4: 158.38.212.149
+  server_ipv6: 2001:700:0:4540:21d:d8ff:feb7:7bad
+  username: "{{ vault_bwctl.username }}"
+  password: "{{ vault_bwctl.password }}"
+
+owamp:
+  server_ipv4: 158.38.212.149
+  server_ipv6: 2001:700:0:4540:21d:d8ff:feb7:7bad
+  username: "{{ vault_owamp.username }}"
+  password: "{{ vault_owamp.password }}"
+
+rtt:
+  server: www.uninett.no
+  samples: 10
+
+www_server: www.google.com
+
+packages:
+  - rsync
+  - bwctl-client
+  - iperf3
+  - curl
+  - bc
+  - python3
+  - daemon
+  # - python3-pip
