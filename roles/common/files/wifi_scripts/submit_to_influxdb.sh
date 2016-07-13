@@ -2,4 +2,4 @@
 
 . ${SCRIPT_DIR}influxdb.credentials
 
-curl -o /dev/null -w "%{http_code}" -s -i -XPOST "http://${DB_USERNAME}:${DB_PASSWORD}@${DB_SERVER}/write?db=${DB_NAME}" --data-binary "$1"
+curl -o /dev/null -w "%{http_code}" -s -i -XPOST "http://${DB_USERNAME}:${DB_PASSWORD}@${DB_SERVER}:${DB_PORT}/write?db=${DB_NAME}" --data-binary "$1"

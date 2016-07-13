@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-
-import json
 import subprocess
 import time
 import logging
@@ -80,7 +77,7 @@ class ScriptManager:
         except PermissionError as e:
             # Probably a malformed script name. Continue
             # trying to execute the other scripts
-            logging.error('Script execution error: {}', e)
+            logging.error('Script execution error: {}'.format(e))
         except subprocess.TimeoutExpired:
             logging.warning(
                     'The following script timed out after {} seconds:'
