@@ -45,8 +45,8 @@
   template: src={{ item }} dest={{ script_dir }}/
   with_fileglob: ../templates/*
 
-- name: Transfer wpa_supplicant certificate
-  copy: src=uninett-ca.cer dest=/etc/wpa_supplicant/uninett-ca.cer
+- name: Transfer wpa_supplicant certificates
+  synchronize: src="{{ cert_dir }}/host_certs/{{ inventory_hostname }}/" dest="/etc/wpa_supplicant/"
 
 - name: Transfer control program
   copy: src=control_program.py dest={{ script_dir }}/
