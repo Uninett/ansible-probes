@@ -29,15 +29,16 @@
   local_action: >
     command 
     {{ role_path }}/files/compile_driver.sh 
-    {{ inventory_hostname }} 
+    {{ ansible_host }} 
     {{ ansible_kernel }} 
     {{ role_path }}/files/drivers/
+  register: output
   when: loaded|failed and not remote_driver.stat.exists and not local_driver.stat.exists and should_compile
 
 ### The driver needs to be installed
 
 - name: Install the driver module
-  copy: src="files/drivers/{{ ansible_kernel }}-8812au.ko" dest="/lib/modules/{{ ansible_kernel }}/kernel/drivers/net/wireless/8812au.ko"
+  copy: src="{{ role_path }}/files/drivers/{{ ansible_kernel }}-8812au.ko" dest="/lib/modules/{{ ansible_kernel }}/kernel/drivers/net/wireless/8812au.ko"
   when: loaded|failed and not remote_driver.stat.exists
 
 - name: Start driver at boot

@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
 import subprocess
 import time
 import logging
 import sys
 import os
+import json
 
 
 class Timer:

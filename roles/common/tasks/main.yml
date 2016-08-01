@@ -1,18 +1,19 @@
 ---
 - include_vars: ../vars/vault.yml
 
-- name: Transfer json-formatted script config
-  copy: content="{{ (default_script_configs | union(group_script_configs | union(host_script_configs))) | to_json }}" dest={{ script_dir }}/script_configs.json
-
 - include: driver.yml
   vars:
-    should_compile: no
+    should_compile: yes
 
 - name: Touch program directory
   file: path={{ prog_dir }} state=directory mode=0755
 
 # This will compile owamp, but it's easier to just transfer an
 # already compiled version
+# NB: There was an issue that rpi3 didn't want to
+# run the binary for rpi1. I thought this was because
+# of 32/64-bit, but 'file' says both binaries are 32
+# bit
 
 # - name: Check if owping is installed
 #   stat: path=/usr/local/bin/owping
@@ -22,7 +23,7 @@
 #   when: not owping.stat.exists
 
 - name: Transfer owping
-  copy: src=owping dest=/usr/local/bin/owping
+  copy: src=owping dest=/usr/bin/owping mode=0755
 
 # Is this necessary?
 # - name: Update apt repositories
@@ -38,49 +39,42 @@
 - name: Transfer scripts
   synchronize: src=wifi_scripts/ dest={{ script_dir }}/
 
-- name: Make the scripts executable
-  shell: "chmod +x {{ script_dir | quote }}/*.sh {{ script_dir | quote }}/*.py"
+- name: Transfer json-formatted script config
+  copy: content="{{ (default_script_configs | union(group_script_configs | union(host_script_configs))) | to_json }}" dest={{ script_dir }}/script_configs.json
 
-- name: Transfer templated config files
-  template: src={{ item }} dest={{ script_dir }}/
-  with_fileglob: ../templates/*
+# Ignore 2G and 5G exclusive  for now, as other things need to
+# be fixed too before they can be used
+# NB: At the moment the configs for 2G and 5G will
+# just use any's certificate, so remember to
+# change that in the conf files!!!
+- name: Read wpa cert filenames
+  local_action: "command ls {{ cert_dir }}/host_certs/{{ inventory_hostname }}/any/"
+  register: any_cert_filename
 
 - name: Transfer wpa_supplicant certificates
   synchronize: src="{{ cert_dir }}/host_certs/{{ inventory_hostname }}/" dest="/etc/wpa_supplicant/"
 
+- name: Transfer templated config files
+  template: src={{ item }} dest={{ script_dir }}/
+  with_fileglob: ../templates/*
+  
+- name: Transfer systemd unit files
+  template: src=../templates/{{ item }} dest=/etc/systemd/system/
+  with_items:
+    - make_ramdisk.service
+    - wifi_probing.service
+    
 - name: Transfer control program
   copy: src=control_program.py dest={{ script_dir }}/
   register: ctrl_program_copy
 
-- name: Generate probe id from eth0 MAC
+- name: Make the scripts executable
+  shell: "chmod +x {{ script_dir | quote }}/*.sh {{ script_dir | quote }}/*.py"
+
+- name: Generate probe id from MAC
   command: "{{ script_dir }}/generate_probe_id.sh"
   args:
     chdir: "{{ script_dir }}"
 
-- name: Run ramdisk creation script
-  command: "{{ script_dir }}/create_ramdisk.sh {{ ramdisk_dir }} {{ script_dir }}"
-
-- name: Make ramdisk script start at boot
-  cron:
-    name: Create ramdisk
-    special_time: reboot
-    job: "{{ script_dir }}/create_ramdisk.sh {{ ramdisk_dir }} {{ script_dir }}"
-
-- name: Kill any existing control program daemon
-  command: daemon --name control_program --stop
-  ignore_errors: yes
-  when: ctrl_program_copy|changed
-
-# This will have no effect if the daemon is
-# already running, so we don't need a conditional
-- name: Daemonize control program
-  command: "daemon --respawn --name control_program {{ script_dir }}/control_program.py {{ ramdisk_dir }}"
-
-- name: Make control program start at boot
-  cron:
-    name: Start control program
-    special_time: reboot
-    job: "daemon --respawn --name control_program {{ script_dir }}/control_program.py {{ ramdisk_dir }}"
-
-- name: Ensure cron is enabled
-  service: name=cron enabled=yes
+- name: Enable and start control program
+  service: name=wifi_probing state=started enabled=yes

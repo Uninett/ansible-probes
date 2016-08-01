@@ -1,0 +1,6 @@
+[Unit]
+Description=Make a ramdisk for wifi measurement scripts
+
+[Service]
+Type=oneshot
+ExecStart={{ script_dir }}/create_ramdisk.sh {{ ramdisk_dir }} {{ script_dir }}

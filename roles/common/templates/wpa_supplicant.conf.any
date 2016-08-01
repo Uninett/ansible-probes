@@ -6,7 +6,7 @@ ctrl_interface=/var/run/wpa_supplicant
               key_mgmt=WPA-EAP
               eap=TTLS
               anonymous_identity="{{ networks.any.anonymous_id }}"
-              ca_cert="/etc/wpa_supplicant/uninett-ca.cer"
+              ca_cert="/etc/wpa_supplicant/any/{{ any_cert_filename.stdout }}"
               identity="{{ networks.any.username }}"
               password="{{ networks.any.password }}"
               phase1="peaplabel=0"

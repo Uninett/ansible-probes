@@ -8,7 +8,8 @@ ap_scan=1
               key_mgmt=WPA-EAP
               eap=TTLS
               anonymous_identity="{{ networks.five_g.anonymous_id }}"
-              ca_cert="/etc/wpa_supplicant/uninett-ca.cer"
+               # NBNBNB: THIS USES ANY'S CERT
+              ca_cert="/etc/wpa_supplicant/any/{{ any_cert_filename.stdout }}"
               identity="{{ networks.five_g.username }}"
               password="{{ networks.five_g.password }}"
               phase1="peaplabel=0"

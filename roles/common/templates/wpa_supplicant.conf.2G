@@ -10,7 +10,8 @@ freq_list=2462
               key_mgmt=WPA-EAP
               eap=TTLS
               anonymous_identity="{{ networks.two_g.anonymous_id }}"
-              ca_cert="/etc/wpa_supplicant/uninett-ca.cer"
+              # NBNBNB: THIS USES ANY'S CERT
+              ca_cert="/etc/wpa_supplicant/any/{{ any_cert_filename.stdout }}"
               identity="{{ networks.two_g.username }}"
               password="{{ networks.two_g.password }}"
               phase1="peaplabel=0"
