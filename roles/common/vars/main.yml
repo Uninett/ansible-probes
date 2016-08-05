@@ -29,5 +29,3 @@ packages:
   - curl
   - bc
   - python3
-  - daemon
-  # - python3-pip

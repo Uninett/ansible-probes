@@ -7,3 +7,6 @@ Type=simple
 ExecStart={{ script_dir }}/control_program.py {{ ramdisk_dir }}
 Restart=always
 RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
