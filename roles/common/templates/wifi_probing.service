@@ -4,8 +4,8 @@ Requires=make_ramdisk.service
 
 [Service]
 Type=simple
-ExecStart={{ script_dir }}/control_program.py {{ ramdisk_dir }}
-Restart=always
+ExecStart={{ script_dir }}/control_program_wrapper.sh {{ script_dir }}/control_program.py {{ ramdisk_dir }}
+Restart=on-failure
 RestartSec=30
 
 [Install]

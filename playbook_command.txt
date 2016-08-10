@@ -1,0 +1,1 @@
+ansible-playbook -i hosts probe.yml --vault-password-file ~/.vault_pass.txt --ssh-common-args='-o UserKnownHostsFile=known_hosts'

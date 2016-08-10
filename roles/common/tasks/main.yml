@@ -25,8 +25,8 @@
 - name: Transfer owping
   copy: src=owping dest=/usr/bin/owping mode=0755
 
-- name: Update apt repositories
-  apt: update_cache=yes
+# - name: Update apt repositories
+#   apt: update_cache=yes
 
 - name: Install necessary packages
   apt: name={{ item }} state=present
@@ -67,8 +67,10 @@
     - wifi_probing.service
     
 - name: Transfer control program
-  copy: src=control_program.py dest={{ script_dir }}/
-  register: ctrl_program_copy
+  copy: src={{ item }} dest={{ script_dir }}/
+  with_items:
+    - control_program.py
+    - control_program_wrapper.sh
 
 - name: Make the scripts executable
   shell: "chmod +x {{ script_dir | quote }}/*.sh {{ script_dir | quote }}/*.py {{ script_dir | quote }}/*.pl"
@@ -78,5 +80,5 @@
   args:
     chdir: "{{ script_dir }}"
 
-- name: Enable and start control program
-  service: name=wifi_probing enabled=yes state=started
+- name: Enable control program
+  service: name=wifi_probing enabled=yes state=restarted
