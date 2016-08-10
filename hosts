@@ -1,6 +1,0 @@
-[rpi]
-rasp1 ansible_host=158.38.153.181 probe_name=dev
-
-[vm]
-vm1 ansible_host=192.168.122.169 probe_name=vm1
-vm2 ansible_host=192.168.122.190 probe_name=vm2
