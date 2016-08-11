@@ -1,6 +1,0 @@
----
-networks:
-  any: {anonymous_id: asdf, description: Any (will use both 2.4 GHz and 5 GHz), id: 1,
-    password: fasd, ssid: sdfa, username: sdfa}
-  five_g: {anonymous_id: '', description: 5 GHz, id: 3, password: '', ssid: '', username: ''}
-  two_g: {anonymous_id: '', description: 2.4 GHz, id: 2, password: '', ssid: '', username: ''}

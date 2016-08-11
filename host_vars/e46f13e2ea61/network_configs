@@ -1,6 +1,0 @@
----
-networks:
-  any: {anonymous_id: wifi-probe@sysuser.uninett.no, description: Any (will use both
-      2.4 GHz and 5 GHz), id: 9, password: M0n1toring, ssid: eduroam, username: eduroam-monitoring-probes@sysuser.uninett.no}
-  five_g: {anonymous_id: '', description: 5 GHz, id: 8, password: '', ssid: '', username: ''}
-  two_g: {anonymous_id: '', description: 2.4 GHz, id: 7, password: '', ssid: '', username: ''}
