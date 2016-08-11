@@ -31,8 +31,8 @@
 - name: Transfer owping
   copy: src=owping dest=/usr/bin/owping mode=0755
 
-# - name: Update apt repositories
-#   apt: update_cache=yes
+- name: Update apt repositories
+  apt: update_cache=yes
 
 - name: Install necessary packages
   apt: name={{ item }} state=present

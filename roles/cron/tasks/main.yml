@@ -1,3 +1,0 @@
----
-- include: cron.yml args={{ item }}
-  with_items: "{{ default_script_configs | union(group_script_configs | union(host_script_configs)) }}"
