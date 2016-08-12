@@ -5,6 +5,10 @@ import logging
 import sys
 import os
 import json
+from logging.handlers import RotatingFileHandler
+
+
+logger = None
 
 
 class Timer:
@@ -73,15 +77,15 @@ class ScriptManager:
         timeout_in_secs = 5*60
         command = [script_obj.cmd] + script_obj.args
         try:
-            logging.info('Calling: {}'.format(command))
+            logger.info('Calling: {}'.format(command))
             subprocess.call(command, timeout=timeout_in_secs)
-            logging.debug('Script process completed')
+            logger.debug('Script process completed')
         except PermissionError as e:
             # Probably a malformed script name. Continue
             # trying to execute the other scripts
-            logging.error('Script execution error: {}'.format(e))
+            logger.error('Script execution error: {}'.format(e))
         except subprocess.TimeoutExpired:
-            logging.warning(
+            logger.warning(
                     'The following script timed out after {} seconds:'
                     '{}'.format(timeout_in_secs, command))
 
@@ -117,13 +121,13 @@ class IOManager:
         if influx_string != b'':
             command = [full_path('submit_to_influxdb.sh'), influx_string]
 
-            logging.info('Sending results to influxdb')
+            logger.info('Sending results to influxdb')
             response = subprocess.check_output(command)
 
             if response == b'204':
-                logging.info('Results successfully received by influxdb.')
+                logger.info('Results successfully received by influxdb.')
             else:
-                logging.warning(
+                logger.warning(
                         'Results were not successfully received by influxdb'
                         'http response code: {}'.format(response))
 
@@ -154,6 +158,21 @@ def is_argument_valid():
     return False
 
 
+def init_logger():
+    log_formatter = logging.Formatter('%(asctime)s %(levelname)s | %(message)s')
+    log_file = full_path('control_program.log')
+
+    handler = RotatingFileHandler(log_file, mode='a', maxBytes=16*1024*1024,
+                                  backupCount=2, encoding=None, delay=0)
+    handler.setFormatter(log_formatter)
+    handler.setLevel(logging.INFO)
+
+    global logger
+    logger = logging.getLogger('root')
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
+
+
 def main():
     if not is_argument_valid():
         return
@@ -162,13 +181,10 @@ def main():
     # all child processes (the wifi scripts)
     os.environ['SCRIPT_DIR'] = full_path('')
 
-    # Can be DEBUG, INFO, WARNING, ERROR and CRITICAL
-    logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s %(levelname)s | %(message)s',
-            filename=full_path('control_program.log'))
+    init_logger()
 
-    logging.info('Initializing script and io manager')
+    logger.info('Initializing script and io manager')
+
     script_man = ScriptManager()
     configs = script_man.load_script_configs(full_path('script_configs.json'))
     script_man.load_scripts(configs)
@@ -176,7 +192,7 @@ def main():
     io = IOManager()
 
     # This script must be run first, because it connects to the internet.
-    logging.info('Connecting wlan0 to the internet')
+    logger.info('Connecting wlan0 to the internet')
     script_man.run_script_once(full_path('connect_8812.sh'), ['any'], io)
 
     while True:
