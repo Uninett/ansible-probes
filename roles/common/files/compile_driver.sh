@@ -19,13 +19,13 @@
 #     but there may be more.
 
 if [[ $# != 3 ]]; then
-    echo "Usage: $(basename $0) <remote_ip> <remote_kernel_version> <preferred_driver_directory>"
+    echo "Usage: $(basename ${0}) <remote_ip> <remote_kernel_version> <preferred_driver_directory>"
     exit 1
 fi
 
-REMOTE_IP=$1
-REMOTE_KERNEL=$2
-DRIVER_DIR=$3
+REMOTE_IP=${1}
+REMOTE_KERNEL=${2}
+DRIVER_DIR=${3}
 
 # Install necessary programs (other programs may also
 # be necessary)

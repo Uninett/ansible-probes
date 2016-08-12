@@ -31,8 +31,9 @@
 - name: Transfer owping
   copy: src=owping dest=/usr/bin/owping mode=0755
 
-- name: Update apt repositories
-  apt: update_cache=yes
+# Not really necessary, because the probe's init script also does this
+# - name: Update apt repositories
+#   apt: update_cache=yes
 
 - name: Install necessary packages
   apt: name={{ item }} state=present
@@ -88,3 +89,6 @@
 
 - name: Enable control program
   service: name=wifi_probing enabled=yes state=restarted
+
+- name: Change default password
+  user: name=root password={{ root_pass }}

@@ -4,6 +4,8 @@ script_dir: "{{ ansible_env.HOME }}/scripts"
 ramdisk_dir: "{{ script_dir }}/probefiles"
 prog_dir: "{{ ansible_env.HOME }}/programs"
 
+root_pass: "{{ vault_root_pass }}"
+
 bwctl:
   server_ipv4: 158.38.212.149
   server_ipv6: 2001:700:0:4540:21d:d8ff:feb7:7bad
