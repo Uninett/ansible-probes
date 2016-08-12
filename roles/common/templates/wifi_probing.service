@@ -1,6 +1,8 @@
 [Unit]
 Description=Control program for running wifi measurement scripts
 Requires=make_ramdisk.service
+Wants=network-online.target
+After=network.target network-online.target
 
 [Service]
 Type=simple

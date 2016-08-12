@@ -18,63 +18,74 @@ default_script_configs:
     args: 
     enabled: true
     minute_interval: 5
+    required: false
 
   - name: Check if ipv6 is available
     script_file: check_ipv6.sh 
     args: any
     enabled: true
     minute_interval: 5
+    required: false
 
   - name: Measure link quality & bitrate
     script_file: collect.sh 
     args: any
     enabled: true
     minute_interval: 5
+    required: false
 
   - name: Measure HTTP and DNS request time for ipv4
     script_file: check_http_v4.sh 
     args: any
     enabled: true
     minute_interval: 5
+    required: false
 
   - name: Measure connection time for ipv4
     script_file: run_owping4.sh 
     args: any
     enabled: true
     minute_interval: 5
+    required: false
 
   - name: Measure throughput for ipv4
     script_file: run_bwctl4.sh 
     args: any
     enabled: true
     minute_interval: 10
+    required: false
 
   - name: Measure round trip time for ipv4
     script_file: rtt4.sh 
     args: any
     enabled: true
     minute_interval: 5
+    required: false
 
   - name: Measure HTTP and DNS request time for ipv6
     script_file: check_http_v6.sh 
     args: any
     enabled: true
     minute_interval: 5
+    required: false
 
   - name: Measure connection time for ipv6
     script_file: run_owping6.sh 
     args: any
     enabled: true
     minute_interval: 5
+    required: false
 
   - name: Measure throughput for ipv6
     script_file: run_bwctl6.sh 
     args: any
     enabled: true
     minute_interval: 10
+    required: false
 
   - name: Measure round trip time for ipv6
     script_file: rtt6.sh 
     args: any
     enabled: true
     minute_interval: 5
+    required: false

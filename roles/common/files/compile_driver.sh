@@ -18,8 +18,8 @@
 #       * rsync
 #     but there may be more.
 
-if [[ $# != 3 ]]; then
-    echo "Usage: $(basename ${0}) <remote_ip> <remote_kernel_version> <preferred_driver_directory>"
+if [[ ${#} != 3 ]]; then
+    echo "Usage: $(basename ${0}) <remote ip> <remote kernel version (run uname -r on pi)> <preferred (local) driver directory>"
     exit 1
 fi
 

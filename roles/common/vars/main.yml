@@ -1,5 +1,6 @@
 ---
-# Important: path must not have / at end # (it will interfere with Ansible's synchronize module)
+# Important: path must not have / at end
+# (it will interfere with Ansible's synchronize module)
 script_dir: "{{ ansible_env.HOME }}/scripts"
 ramdisk_dir: "{{ script_dir }}/probefiles"
 prog_dir: "{{ ansible_env.HOME }}/programs"

@@ -88,6 +88,8 @@ class ScriptManager:
             logger.warning(
                     'The following script timed out after {} seconds:'
                     '{}'.format(timeout_in_secs, command))
+        except subprocess.CalledProcessError as e:
+            logger.error('Script exiting with a non-zero return code: ' + str(e))
 
     def run_script_once(self, command, args, io_manager):
         script = Script(command, 0, list(args))
@@ -122,7 +124,11 @@ class IOManager:
             command = [full_path('submit_to_influxdb.sh'), influx_string]
 
             logger.info('Sending results to influxdb')
-            response = subprocess.check_output(command)
+            try:
+                response = subprocess.check_output(command)
+            except subprocess.CalledProcessError as e:
+                logger.error('Error sending result to db: ' + str(e))
+                return
 
             if response == b'204':
                 logger.info('Results successfully received by influxdb.')
