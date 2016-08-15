@@ -7,13 +7,21 @@
 ${SCRIPT_DIR}stop_wireless.sh
 # sudo service network-manager stop
 
+systemctl stop wpa_supplicant
+if [[ -f /var/run/wpa_supplicant/wlan0 ]]; then
+    rm /var/run/wpa_supplicant/wlan0
+fi
+
 # Associating with WLAN
 
 cat /dev/null > ${SCRIPT_DIR}wpa_time.log
 /sbin/wpa_supplicant -Dwext -iwlan0 -c ${SCRIPT_DIR}wpa_supplicant.conf.$1 -B -t -f ${SCRIPT_DIR}wpa_time.log
 
 # waiting for association...
-sleep 20
+while [[ ! $(cat ${SCRIPT_DIR}wpa_time.log | grep 'CTRL-EVENT-CONNECTED') ]]; do
+    echo 'waiting...'
+    sleep 5
+done
 
 wifi_asso=$(cat ${SCRIPT_DIR}wpa_time.log | grep 'Successfully \| CTRL-EVENT-CONNECTED' | awk 'BEGIN {FS=":"}NR==1{s=$1}END{print $1-s}')
 
