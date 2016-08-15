@@ -18,9 +18,15 @@ cat /dev/null > ${SCRIPT_DIR}wpa_time.log
 /sbin/wpa_supplicant -Dwext -iwlan0 -c ${SCRIPT_DIR}wpa_supplicant.conf.$1 -B -t -f ${SCRIPT_DIR}wpa_time.log
 
 # waiting for association...
+MAX_WAIT=60
+curr_wait=0
 while [[ ! $(cat ${SCRIPT_DIR}wpa_time.log | grep 'CTRL-EVENT-CONNECTED') ]]; do
     echo 'waiting...'
     sleep 5
+    curr_wait=$((${curr_wait}+5))
+    if [[ $curr_wait > $MAX_WAIT || $curr_wait == $MAX_WAIT ]]; then
+        exit 1
+    fi
 done
 
 wifi_asso=$(cat ${SCRIPT_DIR}wpa_time.log | grep 'Successfully \| CTRL-EVENT-CONNECTED' | awk 'BEGIN {FS=":"}NR==1{s=$1}END{print $1-s}')
