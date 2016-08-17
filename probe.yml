@@ -2,7 +2,7 @@
 # Run the driver installation serially, to avoid the
 # driver being compiled in parallel for the same
 # kernels
-- name: Set up and configure wifi probe
+- name: Install wifi driver
   hosts: all
   remote_user: root
   serial: 1

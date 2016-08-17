@@ -12,10 +12,6 @@
 
 # This will compile owamp, but it's easier to just transfer an
 # already compiled version
-# NB: There was an issue that rpi3 didn't want to
-# run the binary for rpi1. I thought this was because
-# of 32/64-bit, but 'file' says both binaries are 32
-# bit
 
 # - name: Check if owping is installed
 #   stat: path=/usr/local/bin/owping
@@ -44,6 +40,7 @@
 - name: Transfer scripts
   copy: src=wifi_scripts/ dest={{ script_dir }}/
 
+# Combines the default, group and host script configs into one single script config
 - name: Transfer json-formatted script config
   copy: content="{{ (default_script_configs | union(group_script_configs | union(host_script_configs))) | to_json }}" dest={{ script_dir }}/script_configs.json
 

@@ -12,6 +12,7 @@ logger = None
 
 
 class Timer:
+    """Used for keeping track of elapsed time"""
     def __init__(self):
         self.reset()
 
@@ -19,10 +20,14 @@ class Timer:
         self.start_time = time.time()
 
     def elapsed_time(self):
+        """Returns elapsed time as the difference between current time
+        and last reset
+        """
         return time.time() - self.start_time
 
 
 class Script:
+    """Data structure consisting of a shell command and a timer"""
     def __init__(self, command, interval, args=[]):
         self.cmd = command
         self.args = args
@@ -31,6 +36,7 @@ class Script:
         self._timer = Timer()
 
     def is_ready(self, reset_if_ready=False):
+        """Returns true if the elapsed time is greater than the set interval"""
         if self._timer.elapsed_time() > self._interval:
             if reset_if_ready:
                 self._timer.reset()
@@ -39,10 +45,13 @@ class Script:
 
 
 class ScriptManager:
+    """Manages multiple scripts and calls them at specified intervals"""
     def __init__(self):
         pass
 
     def load_scripts(self, script_configs):
+        """Parse script config and create Script instances for each entry.
+        Add the entries to a scripts list"""
         self.scripts = []
         for config in script_configs:
             if config['enabled']:
@@ -56,11 +65,13 @@ class ScriptManager:
                 self.scripts.append(Script(command, interval, args))
 
     def load_script_configs(self, path):
+        """Load a json script config and return it as python datastructure"""
         with open(path, 'r') as f:
             config = json.load(f)
         return config
 
     def run_scripts(self, io_manager):
+        """Run all (ready) scripts in the scripts list"""
         is_ready = {}
 
         # Save the "readiness" of each script before executing them,
@@ -74,6 +85,8 @@ class ScriptManager:
                 self.run_single_script(script, io_manager)
 
     def run_single_script(self, script_obj, io_manager):
+        """Run a single script as a blocking subprocess, and log some
+        possible errors"""
         timeout_in_secs = 5*60
         command = [script_obj.cmd] + script_obj.args
         try:
@@ -92,6 +105,7 @@ class ScriptManager:
             logger.error('Script exiting with a non-zero return code: ' + str(e))
 
     def run_script_once(self, command, args, io_manager):
+        """Run an ad-hoc script, that does not have its own Script instance"""
         script = Script(command, 0, list(args))
         self.run_single_script(script, io_manager)
 
@@ -101,6 +115,7 @@ class IOManager:
         pass
 
     def submit_results(self):
+        """Read results_report file and send its content to databases"""
         try:
             # All results are saved in a specific file (called results_report)
             with open(full_path('results_report'), 'rb+') as f:
@@ -118,6 +133,7 @@ class IOManager:
             return
 
     def send_to_influxdb(self, bin_string):
+        """Parse input string and send result to specified InfluxDB server"""
         influx_string = self.convert_to_influx_format(bin_string)
 
         if influx_string != b'':
@@ -138,6 +154,16 @@ class IOManager:
                         'http response code: {}'.format(response))
 
     def convert_to_influx_format(self, bin_string):
+        """Run a script that converts the raw string argument to an
+        InfluxDB-compliant entry, and return the result
+
+        bin_string must be a binary string
+        each line of bin_string should be in the format
+            'dhcp_time_any 5.32'
+        which will be converted to
+            'dhcp_time_any,probe=?,id=? value=5.32 1471427785000000000'
+        where the last number is a unix time stamp
+        """
         p = subprocess.Popen(
                 full_path('report2influxdb.pl'),
                 stdout=subprocess.PIPE,
@@ -148,6 +174,8 @@ class IOManager:
 
 
 def full_path(filename):
+    """Use the supplied argument to construct and return the full
+    path to a script"""
     prefix = str(sys.argv[1])
     if prefix[-1] != '/':
         prefix += '/'
@@ -156,6 +184,7 @@ def full_path(filename):
 
 
 def is_argument_valid():
+    """Return true if the user supplied a single string argument"""
     try:
         str(sys.argv[1])
         return True
@@ -165,6 +194,7 @@ def is_argument_valid():
 
 
 def init_logger():
+    """Set up a logger from python's logging module"""
     log_formatter = logging.Formatter('%(asctime)s %(levelname)s | %(message)s')
     log_file = full_path('control_program.log')
 
