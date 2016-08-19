@@ -14,9 +14,11 @@ logger = None
 class Timer:
     """Used for keeping track of elapsed time"""
     def __init__(self):
+        """Reset timer when instanced"""
         self.reset()
 
     def reset(self):
+        """Set the timer's start time to the current time"""
         self.start_time = time.time()
 
     def elapsed_time(self):
@@ -29,6 +31,11 @@ class Timer:
 class Script:
     """Data structure consisting of a shell command and a timer"""
     def __init__(self, command, interval, args=[]):
+        """Arguments:
+        command:    script name
+        interval:   interval in seconds the script should be run
+        args:       the command/script's arguments
+        """
         self.cmd = command
         self.args = args
 
@@ -231,6 +238,7 @@ def main():
     logger.info('Connecting wlan0 to the internet')
     script_man.run_script_once(full_path('connect_8812.sh'), ['any'], io)
 
+    # This is the main loop
     while True:
         script_man.run_scripts(io)
         io.submit_results()

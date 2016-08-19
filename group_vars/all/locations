@@ -1,2 +1,2 @@
 ---
-cert_dir: '/home/frestr/Ansible/wifi_probe/certs'
+cert_dir: 'ADD_CERT_DIR_HERE'
