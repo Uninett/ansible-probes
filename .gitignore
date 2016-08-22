@@ -1,0 +1,7 @@
+/certs/
+/group_vars/
+/host_vars/
+/inventory/
+/known_hosts
+/logs/
+/vault_pass.txt
