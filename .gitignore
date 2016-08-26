@@ -5,3 +5,4 @@
 /known_hosts
 /logs/
 /vault_pass.txt
+/probe.retry
