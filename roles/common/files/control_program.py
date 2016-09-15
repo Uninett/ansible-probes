@@ -6,6 +6,8 @@ import sys
 import os
 import json
 from logging.handlers import RotatingFileHandler
+from datetime import datetime
+from elasticsearch import Elasticsearch
 
 
 logger = None
@@ -129,6 +131,7 @@ class IOManager:
                 results = f.read()
                 if results != b'':
                     self.send_to_influxdb(results)
+                    self.send_to_elastic(results.decode('utf-8'))
 
                 # Clear the file when done submitting
                 f.truncate(0)
@@ -157,7 +160,7 @@ class IOManager:
                 logger.info('Results successfully received by influxdb.')
             else:
                 logger.warning(
-                        'Results were not successfully received by influxdb'
+                        'Results were not successfully received by influxdb. '
                         'http response code: {}'.format(response))
 
     def convert_to_influx_format(self, bin_string):
@@ -179,6 +182,40 @@ class IOManager:
         result, error = p.communicate(input=bin_string)
         return result
 
+    def send_to_elastic(self, string):
+        """Send data to the elasticsearch server."""
+        es = Elasticsearch(['http://localhost:9200'])
+
+        # Convert from 'a 1\nb 2' to [['a', '1'], ['b', '2']]
+        data_list = [pair.split() for pair in string.split('\n') if len(pair.split()) == 2]
+        # Convert from [['a', '1'], ['b', '2']] to {'a': '1', 'b': '2'}
+        data = {key: value for key, value in data_list}
+        data['@timestamp'] = datetime.utcnow()
+
+        # Read the probe's mac address (used as identification)
+        mac = ''
+        with open(full_path('probe_id.txt'), 'r') as f:
+            mac = f.read().strip()
+        if mac == '':
+            logger.error('Unable to read MAC address from probe_id.txt')
+            return
+
+        logger.info('Sending results to Elasticsearch')
+        try:
+            res = es.index(index='wifi-probe-uninett-{}'.format(datetime.utcnow().strftime('%Y.%m.%d')),
+                           doc_type=mac,
+                           body=data,
+                           timeout='30s')
+        except ConnectionRefusedError:
+            logger.error('Unable to connect to Elasticsearch')
+            return
+
+        if res['created']:
+            logger.info('Results successfully received by Elasticsearch')
+        else:
+            logger.warning(
+                    'Results were not successfully received by Elasticsearch. '
+                    'Response: {}'.format(res))
 
 def full_path(filename):
     """Use the supplied argument to construct and return the full
