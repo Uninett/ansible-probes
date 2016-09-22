@@ -47,6 +47,11 @@
 - name: Transfer json-formatted script config
   copy: content="{{ (default_script_configs | union(group_script_configs | union(host_script_configs))) | to_json }}" dest={{ script_dir }}/script_configs.json
 
+# The old influxdb method uses a template with the credentials, but using
+# json is much easier, so we to that here instead for Elastic
+- name: Transfer json formatted db configs
+  copy: content={{ databases | to_json }} dest={{ script_dir }}/db_configs.json
+
 # Ignore 2G and 5G exclusive  for now, as other things need to
 # be fixed too before they can be used
 # NB: At the moment the configs for 2G and 5G will

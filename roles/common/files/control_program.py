@@ -8,6 +8,7 @@ import json
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
 from elasticsearch import Elasticsearch
+import re
 
 
 logger = None
@@ -121,7 +122,13 @@ class ScriptManager:
 
 class IOManager:
     def __init__(self):
-        pass
+        self.db_configs = {}
+        try:
+            with open(full_path('db_configs.json'), 'r') as f:
+                self.db_configs = json.loads(f.read())
+        except FileNotFoundError:
+            logger.error('Cannot read db_configs.json. Will not be able to send '
+                         'data to databases')
 
     def submit_results(self):
         """Read results_report file and send its content to databases"""
@@ -130,8 +137,15 @@ class IOManager:
             with open(full_path('results_report'), 'rb+') as f:
                 results = f.read()
                 if results != b'':
-                    self.send_to_influxdb(results)
-                    self.send_to_elastic(results.decode('utf-8'))
+                    try:
+                        if ('influxdb' in self.db_configs and
+                                self.db_configs['influxdb']['status'] == 'enabled'):
+                            self.send_to_influxdb(results)
+                        if ('elastic' in self.db_configs and
+                                self.db_configs['elastic']['status'] != 'disabled'):
+                            self.send_to_elastic(results.decode('utf-8'))
+                    except BrokenPipeError as e:
+                        logger.warning('Network pipe was interrupted. Error: {}'.format(e))
 
                 # Clear the file when done submitting
                 f.truncate(0)
@@ -184,13 +198,24 @@ class IOManager:
 
     def send_to_elastic(self, string):
         """Send data to the elasticsearch server."""
-        es = Elasticsearch(['http://localhost:9200'])
+        domain = port = index_prefix = ''
+        if self.db_configs['elastic']['status'] == 'custom':
+            domain = self.db_configs['elastic']['address']
+            port = self.db_configs['elastic']['port']
+            index_prefix = self.db_configs['elastic']['db_name']
+        # In practice, the only other option will be 'uninett'
+        else:
+            # The probe will connect to UNINETT's elastic server through
+            # an SSH tunnel
+            domain = 'localhost'
+            port = '9200'
+            index_prefix = 'wifi-probe-uninett-'
 
-        # Convert from 'a 1\nb 2' to [['a', '1'], ['b', '2']]
-        data_list = [pair.split() for pair in string.split('\n') if len(pair.split()) == 2]
-        # Convert from [['a', '1'], ['b', '2']] to {'a': '1', 'b': '2'}
-        data = {key: value for key, value in data_list}
-        data['@timestamp'] = datetime.utcnow()
+        index = index_prefix + str(datetime.utcnow().strftime('%Y.%m.%d'))
+        url = 'http://{}:{}'.format(domain, port)
+        es = Elasticsearch([url])
+
+        data = self.convert_to_elastic_format(string)
 
         # Read the probe's mac address (used as identification)
         mac = ''
@@ -202,7 +227,7 @@ class IOManager:
 
         logger.info('Sending results to Elasticsearch')
         try:
-            res = es.index(index='wifi-probe-uninett-{}'.format(datetime.utcnow().strftime('%Y.%m.%d')),
+            res = es.index(index=index,
                            doc_type=mac,
                            body=data,
                            timeout='30s')
@@ -216,6 +241,22 @@ class IOManager:
             logger.warning(
                     'Results were not successfully received by Elasticsearch. '
                     'Response: {}'.format(res))
+
+    def convert_to_elastic_format(self, string):
+        # Convert from 'a 1\nb 2' to [['a', '1'], ['b', '2']]
+        data_list = [pair.split() for pair in string.split('\n') if len(pair.split()) == 2]
+        # Convert from [['a', '1'], ['b', '2']] to {'a': '1', 'b': '2'}
+        data = {key: value for key, value in data_list}
+        data['@timestamp'] = datetime.utcnow()
+
+        # Convert string numbers ('12', '12.34') to interger/floats (12, 12.34)
+        for key, value in data.items():
+            if type(value) is str and re.fullmatch('[0-9]+((.|,)[0-9]+)?', value):
+                value = value.replace(',', '.')
+                data[key] = float(value) if '.' in value else int(value)
+
+        return data
+
 
 def full_path(filename):
     """Use the supplied argument to construct and return the full
