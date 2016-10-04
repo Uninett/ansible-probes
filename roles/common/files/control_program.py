@@ -8,6 +8,7 @@ import json
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
 from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import ConnectionError
 import re
 
 
@@ -231,7 +232,7 @@ class IOManager:
                            doc_type=mac,
                            body=data,
                            timeout='30s')
-        except ConnectionRefusedError:
+        except ConnectionError:
             logger.error('Unable to connect to Elasticsearch')
             return
 
@@ -315,6 +316,15 @@ def main():
     # This script must be run first, because it connects to the internet.
     logger.info('Connecting wlan0 to the internet')
     script_man.run_script_once(full_path('connect_8812.sh'), ['any'], io)
+
+    updating = True
+    while updating:
+        try:
+            with open(full_path('../update'), 'r') as f:
+                updating = '1' in f.read()
+            time.sleep(5)
+        except FileNotFoundError:
+            break
 
     # This is the main loop
     while True:

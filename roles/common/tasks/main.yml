@@ -1,10 +1,16 @@
 ---
 - include_vars: ../vars/vault.yml
 
-# Stop the wifi tests if they are running (will only we the case
-# if this playbook has already been run at least once)
-- name: Stop control program (if running)
-  service: name=wifi_probing state=stopped
+# Set a flag to inform the control program that an update is in process
+# (only relevant if this playbook has been run before)
+- name: Set update flag to 1
+  lineinfile: dest={{ script_dir }}/update regexp="^.*" line=1 create=yes
+
+# Restart the control program. This is to make sure all currently
+# running tests are stopped, and the probe is reconnected to the
+# internet before doing further updates
+- name: Restart control program (if running)
+  service: name=wifi_probing state=restarted
   ignore_errors: yes
 
 - name: Touch program directory
@@ -88,8 +94,11 @@
   args:
     chdir: "{{ script_dir }}"
 
+- name: Change default password
+  user: name=root password={{ root_pass }}
+
 - name: Enable control program
   service: name=wifi_probing enabled=yes state=restarted
 
-- name: Change default password
-  user: name=root password={{ root_pass }}
+- name: Set update flag to 0
+  lineinfile: dest={{ script_dir }}/update regexp="^.*" line=0
