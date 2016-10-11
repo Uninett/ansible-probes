@@ -92,6 +92,9 @@
 - name: Blacklist the internal wifi driver
   copy: src=wlan_blacklist.conf dest=/etc/modprobe.d/
 
+- name: Copy connection status script
+  copy: src=connection_status.sh dest/root/
+
 - name: Generate probe id from wlan MAC
   command: "{{ script_dir }}/generate_probe_id.sh"
   args:
