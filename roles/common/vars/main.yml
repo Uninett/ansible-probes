@@ -19,6 +19,13 @@ owamp:
   username: "{{ vault_owamp.username }}"
   password: "{{ vault_owamp.password }}"
 
+default_influxdb:
+  address: 158.38.212.149
+  port: 8086
+  db_name: "{{ username }}"
+  username: "{{ vault_default_influxdb.username }}"
+  password: "{{ vault_default_influxdb.password }}"
+
 rtt:
   server: www.uninett.no
   samples: 10

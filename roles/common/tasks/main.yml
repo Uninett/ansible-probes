@@ -54,7 +54,7 @@
   copy: content="{{ (default_script_configs | union(group_script_configs | union(host_script_configs))) | to_json }}" dest={{ script_dir }}/script_configs.json
 
 # The old influxdb method uses a template with the credentials, but using
-# json is much easier, so we to that here instead for Elastic
+# json is much easier, so we do that here instead for Elastic
 - name: Transfer json formatted db configs
   copy: content={{ databases | to_json }} dest={{ script_dir }}/db_configs.json
 
@@ -74,6 +74,10 @@
   template: src={{ item }} dest={{ script_dir }}/
   with_fileglob: ../templates/*
   
+- name: Use default influxdb config if specified
+  template: src="../templates/influxdb.credentials.default" dest="{{ script_dir}}/influxdb.credentials"
+  when: "{{ databases.influxdb.status == 'uninett' }}"
+
 - name: Transfer systemd unit files
   template: src=../templates/{{ item }} dest=/etc/systemd/system/
   with_items:
@@ -93,7 +97,7 @@
   copy: src=wlan_blacklist.conf dest=/etc/modprobe.d/
 
 - name: Copy connection status script
-  copy: src=connection_status.sh dest/root/
+  copy: src=connection_status.sh dest=/root/
 
 - name: Generate probe id from wlan MAC
   command: "{{ script_dir }}/generate_probe_id.sh"
