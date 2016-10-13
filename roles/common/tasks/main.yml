@@ -90,14 +90,14 @@
     - control_program.py
     - control_program_wrapper.sh
 
+- name: Copy connection status script
+  copy: src=connection_status.sh dest=/root/
+
 - name: Make the scripts executable
-  shell: "chmod +x {{ script_dir | quote }}/*.sh {{ script_dir | quote }}/*.py {{ script_dir | quote }}/*.pl"
+  shell: "chmod +x {{ script_dir | quote }}/*.sh {{ script_dir | quote }}/*.py {{ script_dir | quote }}/*.pl /root/connection_status.sh"
 
 - name: Blacklist the internal wifi driver
   copy: src=wlan_blacklist.conf dest=/etc/modprobe.d/
-
-- name: Copy connection status script
-  copy: src=connection_status.sh dest=/root/
 
 - name: Generate probe id from wlan MAC
   command: "{{ script_dir }}/generate_probe_id.sh"
