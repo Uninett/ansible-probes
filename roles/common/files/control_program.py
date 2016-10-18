@@ -218,6 +218,14 @@ class IOManager:
 
         data = self.convert_to_elastic_format(string)
 
+        # Load some info about the probe (location etc.)
+        with open(full_path('probe_info.json'), 'r') as f:
+            try:
+                info = json.loads(f.read())
+            except ValueError:
+                info = {}
+        data.update(info)
+
         # Read the probe's mac address (used as identification)
         mac = ''
         with open(full_path('probe_id.txt'), 'r') as f:

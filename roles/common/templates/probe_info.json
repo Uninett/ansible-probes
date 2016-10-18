@@ -1,0 +1,6 @@
+{
+    "name": "{{ probe_name }}",
+    "mac": "{{ probe_mac }}",
+    "location": "{{ probe_location }}",
+    "org": "{{ probe_organization }}"
+}
