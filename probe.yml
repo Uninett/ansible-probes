@@ -1,4 +1,5 @@
 ---
+
 # Run the driver installation serially, to avoid the
 # driver being compiled in parallel for the same
 # kernels
@@ -6,6 +7,24 @@
   hosts: all
   remote_user: root
   serial: 1
+
+  # The following pre_tasks are done to avoid the update process being interrupted
+  # by tests that cut the network connection. Only relevent if the probe
+  # already has been updated at least once.
+  pre_tasks:
+  - include_vars: roles/common/vars/main.yml
+
+  # Set a flag to inform the control program that an update is in process
+  - name: Set update flag to 1
+    lineinfile: dest={{ script_dir }}/update regexp="^.*" line=1 create=yes
+    ignore_errors: yes
+
+  # Restart the control program. This is to make sure all currently
+  # running tests are stopped, and the probe is reconnected to the
+  # internet before doing further updates
+  - name: Restart control program (if running)
+    service: name=wifi_probing state=restarted
+    ignore_errors: yes
 
   roles:
     - role: driver

@@ -1,18 +1,6 @@
 ---
 - include_vars: ../vars/vault.yml
 
-# Set a flag to inform the control program that an update is in process
-# (only relevant if this playbook has been run before)
-- name: Set update flag to 1
-  lineinfile: dest={{ script_dir }}/update regexp="^.*" line=1 create=yes
-
-# Restart the control program. This is to make sure all currently
-# running tests are stopped, and the probe is reconnected to the
-# internet before doing further updates
-- name: Restart control program (if running)
-  service: name=wifi_probing state=restarted
-  ignore_errors: yes
-
 - name: Touch program directory
   file: path={{ prog_dir }} state=directory mode=0755
 
