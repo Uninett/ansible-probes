@@ -98,7 +98,7 @@ class ScriptManager:
     def run_single_script(self, script_obj, io_manager):
         """Run a single script as a blocking subprocess, and log some
         possible errors"""
-        timeout_in_secs = 5*60
+        timeout_in_secs = 3*60
         command = [script_obj.cmd] + script_obj.args
         try:
             logger.info('Calling: {}'.format(command))
