@@ -84,6 +84,9 @@
     - make_ramdisk.service
     - wifi_probing.service
     
+- name: Reload systemd unit files
+  systemd: daemon_reload=yes
+
 - name: Transfer control program
   copy: src={{ item }} dest={{ script_dir }}/
   with_items:
