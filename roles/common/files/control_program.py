@@ -240,7 +240,7 @@ class IOManager:
                            doc_type=mac,
                            body=data,
                            timeout='30s')
-        except ConnectionError:
+        except (ConnectionError, ConnectionRefusedError):
             logger.error('Unable to connect to Elasticsearch')
             return
 
