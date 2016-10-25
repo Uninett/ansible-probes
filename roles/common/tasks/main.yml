@@ -39,7 +39,7 @@
 
 # Combines the default, group and host script configs into one single script config
 - name: Transfer json-formatted script config
-  copy: content="{{ (default_script_configs | union(group_script_configs | union(host_script_configs))) | to_json }}" dest={{ script_dir }}/script_configs.json
+  copy: content="{{ host_script_configs | to_json }}" dest={{ script_dir }}/script_configs.json
 
 # The old influxdb method uses a template with the credentials, but using
 # json is much easier, so we do that here instead for Elastic
