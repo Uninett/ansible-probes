@@ -28,6 +28,9 @@ then
 
  wifi_sign=$(echo "scale=2;$val1/$val2"|bc -l)
  
+ # Get the signal power in dBm
+ wifi_dbm_signal=$(iw dev wlan0 scan | grep -i -A10 "$wifi_apid" | awk '/signal/{print $2}')
+
  # Appending collected information to Zabbix report file
 
  echo $I " wifi_freq_"$1  $wifi_freq | awk '{print $1 " " $2 $3 " " $4}' >> ${SCRIPT_DIR}results_report
@@ -35,6 +38,8 @@ then
  echo $I " wifi_sign_"$1  $wifi_sign | awk '{print $1 " " $2 $3 " " $4}' >> ${SCRIPT_DIR}results_report
  echo $I " wifi_qual_"$1  $wifi_qual | awk '{print $1 " " $2 $3 " " $4}' >> ${SCRIPT_DIR}results_report
  echo $I " wifi_conn_"$1  $wifi_conn | awk '{print $1 " " $2 $3 " " $4}' >> ${SCRIPT_DIR}results_report
+
+ echo $I " wifi_dbm_sign_"$1  $wifi_dbm_signal | awk '{print $1 " " $2 $3 " " $4}' >> ${SCRIPT_DIR}results_report
 else
  echo "Err" >> ${SCRIPT_DIR}wifi_fail.log
 fi

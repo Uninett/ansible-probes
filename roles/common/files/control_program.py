@@ -253,14 +253,14 @@ class IOManager:
 
     def convert_to_elastic_format(self, string):
         # Convert from 'a 1\nb 2' to [['a', '1'], ['b', '2']]
-        data_list = [pair.split() for pair in string.split('\n') if len(pair.split()) == 2]
+        data_list = [pair.split(maxsplit=1) for pair in string.split('\n') if len(pair.split(maxsplit=1)) == 2]
         # Convert from [['a', '1'], ['b', '2']] to {'a': '1', 'b': '2'}
-        data = {key: value for key, value in data_list}
+        data = {key: value.strip() for key, value in data_list}
         data['@timestamp'] = datetime.utcnow()
 
         # Convert string numbers ('12', '12.34') to interger/floats (12, 12.34)
         for key, value in data.items():
-            if type(value) is str and re.fullmatch('[0-9]+((.|,)[0-9]+)?', value):
+            if type(value) is str and re.fullmatch('-?[0-9]+((.|,)[0-9]+)?', value):
                 value = value.replace(',', '.')
                 data[key] = float(value) if '.' in value else int(value)
 
