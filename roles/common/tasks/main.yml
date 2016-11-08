@@ -1,6 +1,10 @@
 ---
 - include_vars: ../vars/vault.yml
 
+- name: Restore default gateway while updating
+  shell: 'route add default gw $(route -n | awk ''/eth0/{if ($2 != "0.0.0.0") {print $2}}'') eth0'
+  ignore_errors: yes
+
 - name: Touch program directory
   file: path={{ prog_dir }} state=directory mode=0755
 
@@ -103,3 +107,7 @@
 
 - name: Set update flag to 0
   lineinfile: dest={{ script_dir }}/update regexp="^.*" line=0
+
+- name: Remove the created default gateway
+  command: "route del default gw 0.0.0.0 eth0"
+  ignore_errors: yes
