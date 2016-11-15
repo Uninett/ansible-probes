@@ -16,14 +16,7 @@ while [[ ! -f /sys/class/net/eth0/carrier ]]; do
     sleep 5
 done
 
-# True if ethernet cable is NOT connected
-# if [[ "$(cat /sys/class/net/eth0/carrier)" == "0" ]]; then
+# Load settings in /etc/sysctl.conf
+sysctl -p
 
-# Because of some changes, it should now be possible to have the cable connected
-# while doing measurements
 exec "${PROGRAM_PATH}" "${RAMDISK_DIR}"
-
-# else
-#     echo "Ethernet cable connected. Will not execute program."
-#     exit 0
-# fi
