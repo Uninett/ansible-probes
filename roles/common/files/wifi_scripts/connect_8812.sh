@@ -12,6 +12,9 @@ if [[ -f /var/run/wpa_supplicant/wlan0 ]]; then
     rm /var/run/wpa_supplicant/wlan0
 fi
 
+# Make sure kernel params for wifi are loaded
+sysctl -p
+
 # Associating with WLAN
 
 cat /dev/null > ${SCRIPT_DIR}wpa_time.log
