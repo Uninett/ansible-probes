@@ -21,9 +21,8 @@
 - name: Transfer owping
   copy: src=owping dest=/usr/bin/owping mode=0755
 
-# Not really necessary, because the probe's init script also does this
-# - name: Update apt repositories
-#   apt: update_cache=yes
+- name: Update system packages / ensure packages are up to date
+  apt: update_cache=yes upgrade=yes
 
 - name: Install necessary packages
   apt: name={{ item }} state=present
