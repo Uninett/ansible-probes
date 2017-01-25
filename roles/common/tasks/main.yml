@@ -23,7 +23,7 @@
 
 # apt: upgrade=yes requires aptitude, and can't just use apt-get upgrade...
 - name: Ensure aptitude is installed
-- apt: name=aptitude state=present
+  apt: name=aptitude state=present
 
 - name: Update system packages / ensure packages are up to date
   apt: update_cache=yes upgrade=yes
