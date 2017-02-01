@@ -21,15 +21,9 @@
 - name: Transfer owping
   copy: src=owping dest=/usr/bin/owping mode=0755
 
-- name: Run apt-get update
-  apt: update_cache=yes
-
-# apt: upgrade=yes requires aptitude, and can't just use apt-get upgrade...
-- name: Ensure aptitude is installed
-  apt: name=aptitude state=present
-
-- name: Update system packages / ensure packages are up to date
-  apt: upgrade=yes
+# Not really necessary, because the probe's init script also does this
+# - name: Update apt repositories
+#   apt: update_cache=yes 
 
 - name: Install necessary packages
   apt: name={{ item }} state=present
