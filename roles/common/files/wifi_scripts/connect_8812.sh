@@ -25,12 +25,19 @@ MAX_WAIT=60
 curr_wait=0
 while [[ ! $(cat ${SCRIPT_DIR}wpa_time.log | grep 'CTRL-EVENT-CONNECTED') ]]; do
     echo 'waiting...'
-    sleep 5
-    curr_wait=$((${curr_wait}+5))
-    if [[ $curr_wait > $MAX_WAIT || $curr_wait == $MAX_WAIT ]]; then
+    sleep 2
+    curr_wait=$((${curr_wait}+2))
+    if [[ $curr_wait -ge $MAX_WAIT ]]; then
+        # Failed last time too, so failed two times in a row -> reboot
+        if [[ -e ${SCRIPT_DIR}connection_failed && $(<${SCRIPT_DIR}connection_failed) == "1" ]]; then
+            reboot
+        else
+            echo "1" > ${SCRIPT_DIR}connection_failed
+        fi
         exit 1
     fi
 done
+echo "0" > ${SCRIPT_DIR}connection_failed
 
 wifi_asso=$(cat ${SCRIPT_DIR}wpa_time.log | grep 'Successfully \| CTRL-EVENT-CONNECTED' | awk 'BEGIN {FS=":"}NR==1{s=$1}END{print $1-s}')
 
