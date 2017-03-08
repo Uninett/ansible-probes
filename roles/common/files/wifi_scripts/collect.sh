@@ -5,10 +5,6 @@
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
-while [[ $(iwconfig wlan0 | grep unassociated) ]]; do
-    sleep 1
-done
-
 iwconfig wlan0 > ${SCRIPT_DIR}wifi.out 
 numlines=$(wc -l ${SCRIPT_DIR}wifi.out | awk '{print $1}')
 
