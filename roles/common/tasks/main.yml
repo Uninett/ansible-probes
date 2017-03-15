@@ -107,6 +107,13 @@
   args:
     chdir: "{{ script_dir }}"
 
+- name: Add cron entry to reboot at midnight
+  cron:
+    name: "reboot at midnight"
+    minute: "0"
+    hour: "0"
+    job: "reboot"
+
 - name: Change default password
   user: name=root password={{ root_pass }}
 
