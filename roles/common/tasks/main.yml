@@ -112,7 +112,7 @@
     name: "reboot at midnight"
     minute: "0"
     hour: "0"
-    job: "reboot"
+    job: "/sbin/shutdown -r now"
 
 - name: Change default password
   user: name=root password={{ root_pass }}
