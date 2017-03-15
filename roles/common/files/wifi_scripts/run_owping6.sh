@@ -10,6 +10,9 @@ owping -6 -A AE -u topsi -k ${SCRIPT_DIR}owampd.pfs -t $SERVER_OWAMP6 -L 4 -P 87
 # Extracts jitter and packet loss results from owping
 
 owj_v6=$(cat ${SCRIPT_DIR}owamp_out_v6.log | grep 'jitter' | awk '{print $4}')
+if [[ "$owj_v6" == "nan" ]]; then
+    owj_v6=""
+fi
 echo $I " owj_v6_"$1  $owj_v6 | awk '{print $1 " " $2 $3 " " $4}' >> ${SCRIPT_DIR}results_report
 
 owpl_v6=$(cat ${SCRIPT_DIR}owamp_out_v6.log  | grep 'lost' | awk '{print $5}' | awk 'BEGIN {FS="("} {print $2}' | awk 'BEGIN {FS=")"} {print $1}' | awk 'BEGIN {FS="%"} {print $1}')
