@@ -52,7 +52,7 @@ default_script_configs:
     script_file: run_bwctl4.sh 
     args: any
     enabled: true
-    minute_interval: 10
+    minute_interval: 60
     required: false
 
   - name: Measure round trip time for ipv4
@@ -80,7 +80,7 @@ default_script_configs:
     script_file: run_bwctl6.sh 
     args: any
     enabled: true
-    minute_interval: 10
+    minute_interval: 60
     required: false
 
   - name: Measure round trip time for ipv6
