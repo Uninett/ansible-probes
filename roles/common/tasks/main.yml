@@ -29,6 +29,12 @@
   apt: name={{ item }} state=present
   with_items: "{{ packages }}"
 
+- name: Enable fake-hwclock
+  service: name=fake-hwclock enabled=yes state=started
+
+- name: Enable ntp
+  service: name=ntp enabled=yes state=started
+
 - name: Install elastic search module
   pip: name=elasticsearch executable=pip3
 
