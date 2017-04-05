@@ -1,6 +1,5 @@
 /certs/
-/group_vars/
-!/groups_vars/all
+/groups_vars/all/*.yml
 /group_vars/all/locations.yml
 /host_vars/
 /inventory/
