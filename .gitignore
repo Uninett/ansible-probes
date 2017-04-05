@@ -1,7 +1,7 @@
 /certs/
 /group_vars/
 !/groups_vars/all
-/group_vars/all/locations
+/group_vars/all/locations.yml
 /host_vars/
 /inventory/
 /known_hosts
