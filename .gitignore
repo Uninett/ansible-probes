@@ -1,8 +1,12 @@
 /certs/
 /group_vars/
+!/groups_vars/all
+/group_vars/all/locations
 /host_vars/
 /inventory/
 /known_hosts
 /logs/
 /vault_pass.txt
 /probe.retry
+/roles/common/vars/main.yml
+/roles/common/vars/vault.yml

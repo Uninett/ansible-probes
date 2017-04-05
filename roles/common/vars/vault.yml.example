@@ -1,0 +1,26 @@
+---
+# This file should be encrypted, to allow for it to be distributed via version
+# control. To make an ansible vault file, do 'ansible-vault create vault.yml',
+# and copy the contents below to it (making changes where needed). The password
+# for the vault needs to be places in a file called vault_pass.txt, residing
+# in the project root directory (it's needed for the web server to run
+# Ansible without user interaction)
+vault_bwctl:
+  username: username
+  password: password
+
+vault_owamp:
+  username: username
+  password: password
+
+vault_default_influxdb:
+  username: username
+  password: password
+
+# Password for the root user on the probe
+# Ansible's user module requires the password to be hashed, so
+# to generate the hash, run this command:
+# 'mkpasswd --method=SHA=512', and enter the
+# plaintext password
+
+vault_root_pass: <output from mkpasswd>

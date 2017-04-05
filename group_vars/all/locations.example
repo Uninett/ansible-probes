@@ -1,0 +1,3 @@
+---
+# The absolute path to the ansible certs directory
+cert_dir: '/abs/path/to/probe-website/ansible-probes/certs/'

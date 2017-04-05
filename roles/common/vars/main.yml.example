@@ -1,0 +1,47 @@
+---
+# Important: path must not have / at end
+# (it will interfere with Ansible's synchronize module)
+script_dir: "{{ ansible_env.HOME }}/scripts"
+ramdisk_dir: "{{ script_dir }}/probefiles"
+prog_dir: "{{ ansible_env.HOME }}/programs"
+
+root_pass: "{{ vault_root_pass }}"
+
+# The IPs and URLs should be changed. If the services are not going to
+# be used, they can be left as they are
+bwctl:
+  server_ipv4: 127.0.0.1
+  server_ipv6: ::1
+  username: "{{ vault_bwctl.username }}"
+  password: "{{ vault_bwctl.password }}"
+
+owamp:
+  server_ipv4: 127.0.0.1
+  server_ipv6: ::1
+  username: "{{ vault_owamp.username }}"
+  password: "{{ vault_owamp.password }}"
+
+default_influxdb:
+  address: 127.0.0.1
+  port: 8086
+  db_name: "{{ username }}"
+  username: "{{ vault_default_influxdb.username }}"
+  password: "{{ vault_default_influxdb.password }}"
+
+rtt:
+  server: www.google.com
+  samples: 10
+
+www_server: www.google.com
+
+packages:
+  - rsync
+  - bwctl-client
+  - iperf3
+  - curl
+  - bc
+  - python3
+  - python3-pip
+  - dnsutils
+  - ntp
+  - jq
