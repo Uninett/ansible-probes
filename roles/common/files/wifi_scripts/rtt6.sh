@@ -3,7 +3,6 @@
 . ${SCRIPT_DIR}probe.parameters
 . ${SCRIPT_DIR}probe.id
 
-# ping6 -c $2 rpiconf.labs.uninett.no | grep 'min/avg/max' > ${SCRIPT_DIR}rtt6.log
 ping6 -c $RTT_SAMPLES $SERVER_RTT | grep 'min/avg/max' > ${SCRIPT_DIR}rtt6.log
 
 rttv6_min=$(cat ${SCRIPT_DIR}rtt6.log |awk '{print $4}' | awk 'BEGIN {FS="\/"} {print $1}')

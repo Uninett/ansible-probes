@@ -3,10 +3,6 @@
 # This script is meant to be run by systemd, to allow for  some
 # conditional checks before the control program is started
 
-# Currently it only checks whether an ethernet cable is connected
-# or not. It will not start if it is, because it will mess up
-# the measurements.
-
 PROGRAM_PATH="${1}"
 RAMDISK_DIR="${2}"
 

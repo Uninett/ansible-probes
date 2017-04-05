@@ -42,3 +42,4 @@ packages:
   - python3-pip
   - dnsutils
   - ntp
+  - jq
