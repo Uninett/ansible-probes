@@ -30,10 +30,16 @@
   with_items: "{{ packages }}"
 
 - name: Enable fake-hwclock
-  service: name=fake-hwclock enabled=yes state=started
+  shell: systemctl enable fake-hwclock
+
+- name: Start fake-hwclock
+  shell: systemctl start fake-hwclock
 
 - name: Enable ntp
-  service: name=ntp enabled=yes state=started
+  shell: systemctl enable ntp
+
+- name: Start ntp
+  shell: systemctl start ntp
 
 - name: Install elastic search module
   pip: name=elasticsearch executable=pip3
