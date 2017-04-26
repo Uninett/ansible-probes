@@ -113,6 +113,7 @@
 
 - name: Blacklist the internal wifi driver
   copy: src=wlan_blacklist.conf dest=/etc/modprobe.d/
+  register: wlanblacklist
 
 - name: Generate probe id from wlan MAC
   command: "{{ script_dir }}/generate_probe_id.sh"
@@ -138,3 +139,7 @@
 - name: Remove the created default gateway
   command: "route del default gw 0.0.0.0 eth0"
   ignore_errors: yes
+
+- name: Reboot if internal wlan nic was blacklisted
+  command: "/sbin/shutdown -r +1"
+  when: wlanblacklist.changed
