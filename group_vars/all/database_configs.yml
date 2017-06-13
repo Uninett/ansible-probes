@@ -4,3 +4,5 @@ databases:
     status: uninett, token: '', username: ''}
   influxdb: {address: '', db_name: '', db_type: influxdb, password: '', port: '',
     status: disabled, token: '', username: ''}
+  wifimon: {address: '', db_name: '', db_type: wifimon, password: '', port: '',
+    status: disabled, token: '', username: ''}

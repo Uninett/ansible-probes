@@ -5,6 +5,7 @@ import logging
 import sys
 import os
 import json
+import httplib
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
 from elasticsearch import Elasticsearch
@@ -145,6 +146,9 @@ class IOManager:
                         if ('elastic' in self.db_configs and
                                 self.db_configs['elastic']['status'] != 'disabled'):
                             self.send_to_elastic(results.decode('utf-8'))
+                        if ('wifimon' in self.db_configs and
+                                self.db_configs['wifimon']['status'] != 'disabled'):
+                            self.send_to_wifimon(results.decode('utf-8'))
                     except BrokenPipeError as e:
                         logger.warning('Network pipe was interrupted. Error: {}'.format(e))
 
@@ -250,6 +254,56 @@ class IOManager:
             logger.warning(
                     'Results were not successfully received by Elasticsearch. '
                     'Response: {}'.format(res))
+
+    def send_to_wifimon(self, string):
+        """Send data to the wifimon server."""
+        domain = port = index_prefix = ''
+        if self.db_configs['wifimon']['status'] == 'custom':
+            domain = self.db_configs['wifimon']['address']
+            port = self.db_configs['wifimon']['port']
+            path_prefix = self.db_configs['wifimon']['db_name']
+        # In practice, the only other option will be 'grnet'
+        else:
+            # The probe will connect to UNINETT's elastic server through
+            # an SSH tunnel
+            domain = 'localhost'
+            port = '8443'
+            path_prefix = 'wifimon'
+
+        url = 'http://{}:{}'.format(domain, port)
+
+        data = self.convert_to_wifimon_format(string)
+
+        conn = httplib.HTTPConnection(domain, port)
+        conn.connect()
+        request = conn.putrequest('POST', '/' + path_prefix + '/add/')
+        headers = {}
+        headers['Content-Type'] = 'application/json'
+        headers['User-Agent'] = 'wifiprobe (RPi; UNINETT; Linux)'
+        headers['Accept'] = '*/*'
+        for k in headers
+            conn.putheader(k, headers[k])
+        conn.endheaders()
+
+        conn.send(data)
+
+        // check that conn.status == 200
+
+        conn.close()
+
+
+    def convert_to_wifimon_format(self, string):
+        elastic_data = convert_to_elastic_format(self, string)
+        return {
+            downloadThroughput: data['bwdo_v4_any'],
+            uploadThroughput: data['bwup_v4_any'],
+            localPing: data['rttv4_avg_any'],
+            latitude: null,
+            longitude: null,
+            locationMethod: null,
+            testTool: 'wifiprobe'
+        }
+
 
     def convert_to_elastic_format(self, string):
         # Convert from 'a 1\nb 2' to [['a', '1'], ['b', '2']]
