@@ -279,7 +279,7 @@ class IOManager:
 
         conn = httplib2.Http('.cache')
         (resp, content) = conn.request(
-            'http://{}:{}/{}/add/'.format(domain, port, path_prefix),
+            'https://{}:{}/{}/add/'.format(domain, port, path_prefix),
             'POST',
             body=json.dumps(data, ensure_ascii=True),
             headers={
