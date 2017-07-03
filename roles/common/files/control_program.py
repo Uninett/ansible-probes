@@ -5,7 +5,7 @@ import logging
 import sys
 import os
 import json
-import httplib
+import httplib2
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
 from elasticsearch import Elasticsearch
@@ -147,7 +147,7 @@ class IOManager:
                                 self.db_configs['elastic']['status'] != 'disabled'):
                             self.send_to_elastic(results.decode('utf-8'))
                         if ('wifimon' in self.db_configs and
-                                self.db_configs['wifimon']['status'] != 'disabled'):
+                                self.db_configs['wifimon']['status'] == 'enabled'):
                             self.send_to_wifimon(results.decode('utf-8'))
                     except BrokenPipeError as e:
                         logger.warning('Network pipe was interrupted. Error: {}'.format(e))
@@ -272,36 +272,38 @@ class IOManager:
 
         url = 'http://{}:{}'.format(domain, port)
 
-        data = self.convert_to_wifimon_format(string)
+        try:
+            data = self.convert_to_wifimon_format(string)
+        except Exception as e:
+            return
 
-        conn = httplib.HTTPConnection(domain, port)
-        conn.connect()
-        request = conn.putrequest('POST', '/' + path_prefix + '/add/')
-        headers = {}
-        headers['Content-Type'] = 'application/json'
-        headers['User-Agent'] = 'wifiprobe (RPi; UNINETT; Linux)'
-        headers['Accept'] = '*/*'
-        for k in headers
-            conn.putheader(k, headers[k])
-        conn.endheaders()
+        conn = httplib2.Http('.cache')
+        (resp, content) = conn.request(
+            'http://{}:{}/{}/add/'.format(domain, port, path_prefix),
+            'POST',
+            body=json.dumps(data, ensure_ascii=True),
+            headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'wifiprobe (RPi; UNINETT; Linux)',
+                'Accept': '*/*'
+            }
+        )
 
-        conn.send(data)
-
-        // check that conn.status == 200
+        """check that conn.status == 200"""
 
         conn.close()
 
 
     def convert_to_wifimon_format(self, string):
-        elastic_data = convert_to_elastic_format(self, string)
+        elastic_data = self.convert_to_elastic_format(string)
         return {
-            downloadThroughput: data['bwdo_v4_any'],
-            uploadThroughput: data['bwup_v4_any'],
-            localPing: data['rttv4_avg_any'],
-            latitude: null,
-            longitude: null,
-            locationMethod: null,
-            testTool: 'wifiprobe'
+            'downloadThroughput': elastic_data['bwdo_v4_any'],
+            'uploadThroughput': elastic_data['bwup_v4_any'],
+            'localPing': elastic_data['rttv4_avg_any'],
+            'latitude': None,
+            'longitude': None,
+            'locationMethod': None,
+            'testTool': 'wifiprobe'
         }
 
 
