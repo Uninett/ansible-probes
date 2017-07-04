@@ -147,7 +147,7 @@ class IOManager:
                                 self.db_configs['elastic']['status'] != 'disabled'):
                             self.send_to_elastic(results.decode('utf-8'))
                         if ('wifimon' in self.db_configs and
-                                self.db_configs['wifimon']['status'] == 'enabled'):
+                                self.db_configs['wifimon']['status'] == 'enabled' or self.db_configs['wifimon']['status'] == 'custom'):
                             self.send_to_wifimon(results.decode('utf-8'))
                     except BrokenPipeError as e:
                         logger.warning('Network pipe was interrupted. Error: {}'.format(e))
@@ -264,24 +264,21 @@ class IOManager:
             path_prefix = self.db_configs['wifimon']['db_name']
         # In practice, the only other option will be 'grnet'
         else:
-            # The probe will connect to UNINETT's elastic server through
-            # an SSH tunnel
-            domain = 'localhost'
-            port = '8443'
+            port = '443'
             path_prefix = 'wifimon'
 
-        url = 'http://{}:{}'.format(domain, port)
-
         try:
+            if (domain == '' or domain == None):
+                return
             data = self.convert_to_wifimon_format(string)
             r = requests.put(
-                'http://{}:{}/{}/add/'.format(domain, port, path_prefix),
+                'https://{}:{}/{}/add/'.format(domain, port, path_prefix),
                 json=data,
                 headers={
                     'Content-Type': 'application/json',
                     'User-Agent': 'wifiprobe (RPi; UNINETT; Linux)',
                     'Accept': '*/*'
-                }
+                },
                 timeout=30
             )
 
