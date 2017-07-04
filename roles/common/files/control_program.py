@@ -223,9 +223,9 @@ class IOManager:
         data = self.convert_to_elastic_format(string)
 
         # Load some info about the probe (location etc.)
-        with open(full_path('probe_info.json'), 'r') as f:
+        with open(full_path('probe_info.json'), 'rb') as f:
             try:
-                info = json.loads(f.read())
+                info = json.loads(f.read().decode('utf-8'))
             except ValueError:
                 info = {}
         data.update(info)
