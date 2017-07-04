@@ -5,7 +5,7 @@ import logging
 import sys
 import os
 import json
-import httplib2
+import requests
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
 from elasticsearch import Elasticsearch
@@ -274,32 +274,32 @@ class IOManager:
 
         try:
             data = self.convert_to_wifimon_format(string)
+            r = requests.put(
+                'http://{}:{}/{}/add/'.format(domain, port, path_prefix),
+                json=data,
+                headers={
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'wifiprobe (RPi; UNINETT; Linux)',
+                    'Accept': '*/*'
+                }
+                timeout=30
+            )
+
+            if r.status_code != 200 and r.status_code != 201 and r.status_code != 202 and r.status_code != 204:
+                logger.error('Wifimon returned status code {}'.format(r.status_code))
+                logger.info(r.text)
+
         except Exception as e:
+            logger.error('Cannot report to wifimon')
             return
-
-        conn = httplib2.Http('.cache')
-        (resp, content) = conn.request(
-            'https://{}:{}/{}/add/'.format(domain, port, path_prefix),
-            'POST',
-            body=json.dumps(data, ensure_ascii=True),
-            headers={
-                'Content-Type': 'application/json',
-                'User-Agent': 'wifiprobe (RPi; UNINETT; Linux)',
-                'Accept': '*/*'
-            }
-        )
-
-        """check that conn.status == 200"""
-
-        conn.close()
 
 
     def convert_to_wifimon_format(self, string):
         elastic_data = self.convert_to_elastic_format(string)
         return {
-            'downloadThroughput': elastic_data['bwdo_v4_any'],
-            'uploadThroughput': elastic_data['bwup_v4_any'],
-            'localPing': elastic_data['rttv4_avg_any'],
+            'downloadThroughput': round(elastic_data['bwdo_v4_any'] * 125),
+            'uploadThroughput': round(elastic_data['bwup_v4_any'] * 125),
+            'localPing': round(elastic_data['rttv4_avg_any'], 1),
             'latitude': None,
             'longitude': None,
             'locationMethod': None,
