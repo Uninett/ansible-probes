@@ -271,7 +271,7 @@ class IOManager:
             if (domain == '' or domain == None):
                 return
             data = self.convert_to_wifimon_format(string)
-            r = requests.put(
+            r = requests.post(
                 'https://{}:{}/{}/add/'.format(domain, port, path_prefix),
                 json=data,
                 headers={
