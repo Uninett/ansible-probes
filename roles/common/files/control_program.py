@@ -297,9 +297,9 @@ class IOManager:
             'downloadThroughput': round(elastic_data['bwdo_v4_any'] * 125),
             'uploadThroughput': round(elastic_data['bwup_v4_any'] * 125),
             'localPing': round(elastic_data['rttv4_avg_any'], 1),
-            'latitude': None,
-            'longitude': None,
-            'locationMethod': None,
+            'latitude': 0, # Using None causes the backend to return 404
+            'longitude': 0, # Using None causes the backend to return 404
+            'locationMethod': None, # Here, None is fine
             'testTool': 'wifiprobe'
         }
 
