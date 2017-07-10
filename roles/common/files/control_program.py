@@ -283,11 +283,16 @@ class IOManager:
             )
 
             if r.status_code != 200 and r.status_code != 201 and r.status_code != 202 and r.status_code != 204:
-                logger.error('Wifimon returned status code {}'.format(r.status_code))
-                logger.info(r.text)
+                logger.error('wifimon: returned status code {}'.format(r.status_code))
+                logger.info('wifimon: {}'.format(r.text))
+            else:
+                logger.info('wifimon: Reported to wifimon')
 
-        except Exception as e:
-            logger.error('Cannot report to wifimon')
+        except requests.exceptions.RequestException as e:
+            logger.error('wifimon: {}'.format(e))
+            return
+        except KeyError as e:
+            logger.error('wifimon: {}'.format('Not enough measurements'))
             return
 
 
