@@ -271,6 +271,8 @@ class IOManager:
             if (domain == '' or domain == None):
                 return
             data = self.convert_to_wifimon_format(string)
+            logger.debug('wifimon: POST to https://{}:{}/{}/add/'.format(domain, port, path_prefix))
+            logger.debug('wifimon: {}'.format(logger.info(json.dumps(data))))
             r = requests.post(
                 'https://{}:{}/{}/add/'.format(domain, port, path_prefix),
                 json=data,
