@@ -147,7 +147,7 @@ class IOManager:
                                 self.db_configs['elastic']['status'] != 'disabled'):
                             self.send_to_elastic(results.decode('utf-8'))
                         if ('wifimon' in self.db_configs and
-                                self.db_configs['wifimon']['status'] == 'enabled' or self.db_configs['wifimon']['status'] == 'custom'):
+                                self.db_configs['wifimon']['status'] == 'enabled'):
                             self.send_to_wifimon(results.decode('utf-8'))
                     except BrokenPipeError as e:
                         logger.warning('Network pipe was interrupted. Error: {}'.format(e))
@@ -257,15 +257,9 @@ class IOManager:
 
     def send_to_wifimon(self, string):
         """Send data to the wifimon server."""
-        domain = port = index_prefix = ''
-        if self.db_configs['wifimon']['status'] == 'custom':
-            domain = self.db_configs['wifimon']['address']
-            port = self.db_configs['wifimon']['port']
-            path_prefix = self.db_configs['wifimon']['db_name']
-        # In practice, the only other option will be 'grnet'
-        else:
-            port = '443'
-            path_prefix = 'wifimon'
+        domain = self.db_configs['wifimon']['address']
+        port = self.db_configs['wifimon']['port']
+        path_prefix = self.db_configs['wifimon']['db_name']
 
         try:
             if (domain == '' or domain == None):
