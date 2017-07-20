@@ -3,7 +3,7 @@
 
 mac=$(ifconfig wlan0 | grep -oE '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}' | sed 's/://g')
 # The REALTEK check is to prevent selection of the interval wifi card on the rpi3
-if [[ "$mac" == "" || $(iwconfig wlan0 | grep REALTEK) == "" ]]; then
+if [[ "$mac" == "" || ($(iwconfig wlan0 | grep REALTEK) == "" && $(lsb_release -a | grep Kali)) ]]; then
     mac=$(ifconfig wlan1 | grep -oE '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}' | sed 's/://g')
     if [[ "$mac" == "" || $(iwconfig wlan1 | grep REALTEK) == "" ]]; then
         echo "Unable to read wlan MAC"
