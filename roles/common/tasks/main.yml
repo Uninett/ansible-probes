@@ -23,7 +23,7 @@
 
 # Not really necessary, because the probe's init script also does this
 # - name: Update apt repositories
-#   apt: update_cache=yes 
+#   apt: update_cache=yes
 
 - name: Install necessary packages
   apt: name={{ item }} state=present
@@ -77,7 +77,7 @@
 - name: Transfer templated config files
   template: src={{ item }} dest={{ script_dir }}/
   with_fileglob: ../templates/*
-  
+
 - name: Use default influxdb config if specified
   template: src="../templates/influxdb.credentials.default" dest="{{ script_dir}}/influxdb.credentials"
   when: "{{ databases.influxdb.status == 'uninett' }}"
@@ -87,7 +87,7 @@
   with_items:
     - make_ramdisk.service
     - wifi_probing.service
- 
+
 - name: Reload systemd unit files
   command: "systemctl daemon-reload"
 
@@ -114,6 +114,8 @@
 - name: Blacklist the internal wifi driver
   copy: src=wlan_blacklist.conf dest=/etc/modprobe.d/
   register: wlanblacklist
+  when: "'lsb_release -a | grep Kali'"
+
 
 - name: Generate probe id from wlan MAC
   command: "{{ script_dir }}/generate_probe_id.sh"

@@ -28,6 +28,7 @@
 
   roles:
     - role: driver
+      when: "'lsb_release -a | grep Kali'"
 
 - name: Set up and configure wifi probe
   hosts: all
