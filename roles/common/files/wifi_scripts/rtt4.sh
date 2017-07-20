@@ -3,7 +3,7 @@
 . ${SCRIPT_DIR}probe.parameters
 . ${SCRIPT_DIR}probe.id
 
-ping4 -I wlan0 -c $RTT_SAMPLES $SERVER_RTT | grep 'min/avg/max' > ${SCRIPT_DIR}rtt4.log
+ping -I wlan0 -c $RTT_SAMPLES $SERVER_RTT | grep 'min/avg/max' > ${SCRIPT_DIR}rtt4.log
 
 rttv4_min=$(cat ${SCRIPT_DIR}rtt4.log |awk '{print $4}' | awk 'BEGIN {FS="\/"} {print $1}')
 rttv4_avg=$(cat ${SCRIPT_DIR}rtt4.log |awk '{print $4}' | awk 'BEGIN {FS="\/"} {print $2}')
