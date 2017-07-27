@@ -114,7 +114,6 @@
 - name: Blacklist the internal wifi driver
   copy: src=wlan_blacklist.conf dest=/etc/modprobe.d/
   register: wlanblacklist
-  when: ansible_distribution == "Kali"
 
 
 - name: Generate probe id from wlan MAC
