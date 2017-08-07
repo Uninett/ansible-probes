@@ -1,0 +1,31 @@
+---
+
+- name: Apt-get update
+  apt:
+    update_cache: yes
+
+- name: Apt-get upgrade
+  apt:
+    upgrade: yes
+
+- name: Get distribution upgrade
+  apt:
+    upgrade: dist
+
+- name: Update sources.list to include new Stretch repositories
+  command: sed -i 's/jessie/stretch/g' /etc/apt/sources.list
+
+- name: Apt-get update
+  apt:
+    update_cache: yes
+
+- name: Apt-get upgrade
+  apt:
+    upgrade: yes
+
+- name: Get distribution upgrade
+  apt:
+    upgrade: dist
+
+- name: Reboot to enable distribution upgrade
+  command: "/sbin/shutdown -r 0"

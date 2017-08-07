@@ -1,7 +1,12 @@
 ---
 
-- name: Install tools to create and configure the bridge and provide dhcp to the containers
-  shell: apt-get --yes --allow-unauthenticated install bridge-utils dnsmasq-base
+- name: Install tools to create and configure the bridge
+  apt:
+    name: bridge-utils,dnsmasq-base
+
+- name: Install tools to provide dhcp to the containers
+  apt:
+    name: bridge-utils,dnsmasq-base
 
 # not allowed to do this even when running as root
 #- name: Turn on forwarding to support NAT

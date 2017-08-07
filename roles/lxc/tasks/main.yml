@@ -1,0 +1,21 @@
+---
+
+- name: Install lxc
+  apt:
+    name: lxc
+
+- name: Set up network bridge for container
+  include: bridge.yml
+
+- name: Transfer container
+
+
+- name: Set password
+
+- name: Register lxc
+
+- name: Start lxc on boot
+
+- name: Upgrade to latest Debian
+  include: stretch.yml
+  when: ansible_distribution == "Debian" and not ansible_distribution_major_version == "9"
