@@ -1,5 +1,4 @@
 ---
-- include_vars: ../../common/vars/vault.yml
 
 - name: Upgrade to latest Debian
   include: debian.yml
@@ -41,7 +40,7 @@
   command: chroot /var/lib/lxc/container/rootfs /debootstrap/debootstrap --second-stage
 
 - name: Set container password
-  command: chroot /var/lib/lxc/container/rootfs echo 'root:{{ root_pass }}'|chpasswd
+  command: echo 'root:{{ root_pass }}' | chroot /var/lib/lxc/container/rootfs chpasswd
 
 - name: Configure the container, include settings for bridge
   blockinfile:
