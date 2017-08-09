@@ -11,15 +11,25 @@
 - name: Turn on forwarding to support NAT
   command: sysctl net.ipv4.ip_forward=1
 
+- name: Turn on forwarding to support NAT
+  replace:
+    dest: /etc/sysctl.conf
+    regexp: "#net.ipv4.ip_forward=1"
+    replace: "net.ipv4.ip_forward=1"
+
 - name: Create network bridge
   blockinfile:
     dest: /etc/network/interfaces
     block: |
       auto lxcbr0
       iface lxcbr0 inet static
+        bridge_ports wlan0
+        bridge_fd 0
         address 192.168.30.1
         netmask 255.255.255.0
         post-up /opt/bin/lxcbr0-up
+        broadcast 192.168.1.255
+        gateway 192.168.1.1
 
 - name: Make directory for bridge post-up script
   file: path=/opt/bin state=directory
@@ -27,7 +37,7 @@
 - name: Write bridge post-up script
   blockinfile:
     create: yes
-    dest: /opt/bin/lxcbr0
+    dest: /opt/bin/lxcbr0-up
     mode: ugo+x
     block: |
       #!/bin/sh

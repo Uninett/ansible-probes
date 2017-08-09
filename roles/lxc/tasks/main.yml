@@ -1,4 +1,5 @@
 ---
+- include_vars: ../../common/vars/vault.yml
 
 - name: Upgrade to latest Debian
   include: debian.yml
@@ -28,20 +29,32 @@
   file: path=/var/lib/lxc/container state=directory
 
 - name: Transfer container system
-  copy: src=../rootfs dest=/var/lib/lxc/container/
+  synchronize: src=../rootfs dest=/var/lib/lxc/container/
+
+#- name: Copy qemu files for compiling
+#  copy:
+#    src: /usr/bin/qemu-arm-static
+#    dest: /var/lib/lxc/container/rootfs/usr/bin
+#    remote_src: yes
 
 - name: Run debootstrap second stage
   command: chroot /var/lib/lxc/container/rootfs /debootstrap/debootstrap --second-stage
 
+- name: Set container password
+  command: chroot /var/lib/lxc/container/rootfs echo 'root:{{ root_pass }}'|chpasswd
+
 - name: Configure the container, include settings for bridge
   blockinfile:
     dest: /var/lib/lxc/container/config
+    create: yes
     block: |
       lxc.utsname = container
       lxc.rootfs = /var/lib/lxc/container/rootfs
+      lxc.start.auto = 1
+      lxc.start.delay = 5
       lxc.network.type = veth
       lxc.network.flags = up
-      lxc.network.link = lxc-nat-bridge
+      lxc.network.link = lxcbr0
       lxc.network.name = wlan0
       lxc.network.ipv4 = 192.168.30.2
       lxc.network.ipv4.gateway = 192.168.30.1
@@ -49,9 +62,5 @@
 - name: Set up network bridge for container
   include: bridge.yml
 
-
-
-#- name: Set password
-
-
-#- name: Start lxc on boot
+- name: Start container
+  command: lxc-start -n container
