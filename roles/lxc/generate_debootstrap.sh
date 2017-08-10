@@ -28,6 +28,10 @@ mkdir rootfs/root/scripts
 echo "[+] Transfer scripts"
 cp ../../common/files/wifi_scripts/ rootfs/root/scripts/
 
+echo "[+] Transfer script & database configs"
+cp ../../../group_vars/all/db_configs.json rootfs/root/scripts/
+cp ../../../group_vars/all/script_configs.json rootfs/root/scripts/
+
 echo "[+] Transfer templates"
 cp ../../common/templates rootfs/root/scripts/
 
@@ -39,12 +43,15 @@ echo "[+] Transfer control program"
 cp ../../common/files/control_program.py rootfs/root/scripts/
 cp ../../common/files/control_program_wrapper.sh rootfs/root/scripts/
 
+echo "[+] Copy connection status script"
+cp ../../common/files/connection_status.sh rootfs/root/
 
-# TODO: Handle script & db configs
-""" After deployment:
-Enable and start services,
-pip3 install elasticsearch,
-wpa_supplicant,
-Use default influxdb config if specified,
-Reload systemd unit files
-"""
+echo "[+] Enable IPv6 for wlan0 by changing sysctl.conf"
+cat << EOF >> /etc/sysctl.conf
+net.ipv6.conf.wlan0.accept_ra=1
+net.ipv6.conf.wlan0.accept_ra_defrtr=1
+net.ipv6.conf.wlan0.accept_ra_pinfo=1
+EOF
+
+echo "[+] Make the scripts executable"
+chmod +x rootfs/root/scripts/*.sh rootfs/root/scripts/*.py rootfs/root/scripts/*.pl
