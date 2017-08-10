@@ -1,0 +1,1 @@
+{"elastic": {"status": "uninett", "username": "", "db_type": "elastic", "token": "", "db_name": "", "address": "", "password": "", "port": ""}, "influxdb": {"status": "disabled", "username": "", "db_type": "influxdb", "token": "", "db_name": "", "address": "", "password": "", "port": ""}}
