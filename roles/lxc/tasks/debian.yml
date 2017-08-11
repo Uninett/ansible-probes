@@ -4,9 +4,17 @@
   apt:
     update_cache: yes
 
+# Workaround for apt-get issue described here:
+# https://github.com/ansible/ansible/issues/27401
+# Workaround can be replaced by using the force_apt_get flag after updating to ansible 2.4
+- name: Prevent bug with apt-get upgrade
+  shell: dpkg --configure -a
+
 - name: Apt-get upgrade
-  apt:
-    upgrade: yes
+  shell: PT_LISTCHANGES_FRONTEND=none DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get upgrade -f -y --force-yes -oDpkg::Options::="--force-confdef" -oDpkg::Options::="--force-confold"
+#  apt:
+#    upgrade: yes
+#    force_apt_get: yes
 
 - name: Get distribution upgrade
   apt:
@@ -20,8 +28,10 @@
     update_cache: yes
 
 - name: Apt-get upgrade
-  apt:
-    upgrade: yes
+  command: env APT_LISTCHANGES_FRONTEND=none DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get upgrade -y --force-yes -oDpkg::Options::="--force-confdef" -oDpkg::Options::="--force-confold"
+#  apt:
+#    upgrade: yes
+#    force_apt_get: yes
 
 - name: Get distribution upgrade
   apt:
