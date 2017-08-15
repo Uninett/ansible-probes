@@ -13,11 +13,13 @@
   # already has been updated at least once.
   pre_tasks:
   - include_vars: roles/common/vars/main.yml
+    when: probe_name != "Raspbian_lxc"
 
   # Set a flag to inform the control program that an update is in process
   - name: Set update flag to 1
     lineinfile: dest={{ script_dir }}/update regexp="^.*" line=1 create=yes
     ignore_errors: yes
+    when: probe_name != "Raspbian_lxc"
 
   # Restart the control program. This is to make sure all currently
   # running tests are stopped, and the probe is reconnected to the
@@ -25,6 +27,7 @@
   - name: Restart control program (if running)
     service: name=wifi_probing state=restarted
     ignore_errors: yes
+    when: probe_name != "Raspbian_lxc"
 
   roles:
     - role: driver
@@ -41,3 +44,15 @@
 
   roles:
     - role: common
+      when: probe_name != "Raspbian_lxc"
+
+- name: LXC stuff
+  hosts: all
+  remote_user: root
+
+  pre_tasks:
+  - include_vars: roles/common/vars/main.yml
+
+  roles:
+    - role: lxc
+      when: probe_name == "Raspbian_lxc"
