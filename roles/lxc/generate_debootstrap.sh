@@ -12,10 +12,6 @@ echo "[+] Set up stable debian system"
 debootstrap --include ntp,fake-hwclock,rsync,bwctl-client,iperf3,curl,bc,python3,python3-pip,dnsutils,ntp,jq \
 --foreign --arch armhf stable rootfs http://ftp.debian.org/debian/
 
-echo "[+] Alter permissions"
-# Must alter permissions to allow ansible to read the root folder when copying to host
-chmod 744 rootfs/root/
-
 echo "[+] Transfer owping"
 cp ../common/files/owping rootfs/usr/bin/owping
 
@@ -55,3 +51,7 @@ EOF
 
 echo "[+] Make the scripts executable"
 chmod +x rootfs/root/scripts/*.sh rootfs/root/scripts/*.py rootfs/root/scripts/*.pl rootfs/root/connection_status.sh
+
+echo "[+] Alter permissions"
+# Must alter permissions to allow ansible to read the root folder when copying to host
+chmod -R 0755 rootfs/root/
