@@ -154,6 +154,10 @@
 - name: Enable control program
   service: name=wifi_probing enabled=yes state=restarted
 
+- name: Update driver for wireless adapter
+  shell: install-wifi
+  when: ansible_distribution != "Kali"
+
 - name: Set update flag to 0
   lineinfile: dest={{ script_dir }}/update regexp="^.*" line=0
 

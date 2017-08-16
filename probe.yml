@@ -30,11 +30,6 @@
     - role: driver
       when: ansible_distribution == "Kali"
 
-  tasks:
-     - name: Update driver for wireless adapter
-       shell: install-wifi
-       when: ansible_distribution != "Kali"
-
 - name: Set up and configure wifi probe
   hosts: all
   remote_user: root
