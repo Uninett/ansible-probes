@@ -2,23 +2,13 @@
 
 - name: Upgrade to latest Debian
   include: debian.yml
+  vars:
+    distro_upgraded: true
   when: ansible_distribution == "Debian" and not ansible_distribution_major_version == "9"
 
 - name: Install debootstrap
   apt:
     name: debootstrap
-
-#- name: Install qemu
-#  apt:
-#    name: qemu
-
-#- name: Install qemu-user-static
-#  apt:
-#    name: qemu-user-static
-
-#- name: Install binfmt-support
-#  apt:
-#    name: binfmt-support
 
 - name: Install lxc
   apt:
@@ -29,12 +19,6 @@
 
 - name: Transfer container system
   synchronize: src=../rootfs dest=/var/lib/lxc/container/
-
-#- name: Copy qemu files for compiling
-#  copy:
-#    src: /usr/bin/qemu-arm-static
-#    dest: /var/lib/lxc/container/rootfs/usr/bin
-#    remote_src: yes
 
 - name: Run debootstrap second stage
   command: chroot /var/lib/lxc/container/rootfs /debootstrap/debootstrap --second-stage
@@ -63,3 +47,7 @@
 
 - name: Start container
   command: lxc-start -n container
+
+- name: Reboot to enable distribution upgrade
+  command: "/sbin/shutdown -r +1"
+  when: distro_upgraded

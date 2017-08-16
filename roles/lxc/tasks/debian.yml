@@ -36,6 +36,3 @@
 - name: Get distribution upgrade
   apt:
     upgrade: dist
-
-- name: Reboot to enable distribution upgrade
-  command: "/sbin/shutdown -r 0"
